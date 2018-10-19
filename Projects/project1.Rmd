@@ -1,0 +1,280 @@
+---
+title: "425 Project"
+output: 
+  html_document:
+    theme: yeti
+    code_folding: hide
+    toc: true
+    toc_float: true
+---
+```{r, include=FALSE}
+library(plotrix)
+library(mosaic)
+library(pander)
+library(DT)
+library(car)
+library(ggplot2)
+library(lmtest)
+```
+
+```{r, include=FALSE}
+pluton <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%203%20Data%20Sets/CH03TA10.txt", header=FALSE)
+colnames(pluton) <- c("AlphaCount","PlutoniumActivity")
+
+
+pluton2 <- subset(pluton, AlphaCount != .106)
+
+```
+
+## Background
+
+```{r}
+pander(head(pluton))
+```
+
+Our goal is to estimate and predict the relationship between alpha counts per second and plutonium activity. A sample of the data is shown above. 
+
+## Analysis
+
+We will start by determining the distribution of our dependent and independent variables.
+
+```{r, fig.height=3.5}
+stripchart(pluton$AlphaCount, method="stack", main="Distribution of dependent variable AlphaCount")
+stripchart(pluton$PlutoniumActivity, method="stack", main="Distribution of independent variable Plutonium Activity")
+```
+
+It appears that our AlphaCount, is left skewed. This is the same with the PlutoniumActivity, but there appears to be a decent distribution across the scope we hope to cover.
+
+No apparent outliers are present in the graphs above but one can be seen when the two are plotted together.  
+
+
+```{r, warning=FALSE}
+ggplot(data = pluton, aes(x = PlutoniumActivity, y = AlphaCount)) + 
+  geom_point(color='red') +
+  geom_smooth(method = "loess", se = FALSE, color="red") +
+  xlab("Plutonium Activity pCi per g") +
+  ylab("Alpha Count per sec") +
+  ggtitle("Original data with Lowess Curve")
+```
+
+A graph of the data and the lowess curve point out there is an extreme outlier when plutonium activity is 0. 
+
+Because the accuracy of this result or recording can be severely questioned we will omit this individual and re-graph the data.
+
+
+```{r, warning=FALSE}
+ggplot(data = pluton2, aes(x = PlutoniumActivity, y = AlphaCount)) + 
+  geom_point(color='red') +
+  geom_smooth(method = "loess", se = FALSE, color="red") +
+  xlab("Plutonium Activity pCi g") +
+  ylab("Alpha Count per sec") +
+  ggtitle("Data with Lowess curve and the outlier removed")
+
+```
+
+By the looks of the graph alone a linear relationship is apparent but constant variance may be an issue. 
+
+We will start our regression by using the following model,
+
+$$
+Y_i= \beta_0 + \beta_1X_i + \epsilon_i \\
+\text{where} \ \epsilon_i \sim N(0, \sigma^2) 
+$$
+Along with the following hypotheses
+
+$$
+H_0: \beta_1=0  \\
+H_a: \beta_1 \ne 0   \\
+\alpha = 0.05 
+$$
+
+```{r}
+pluton.lm <- lm(AlphaCount ~ PlutoniumActivity, data=pluton2)
+pander(summary(pluton.lm))
+par(mfrow=c(1,2))
+plot(pluton.lm, which=1:2)
+```
+
+It appears that there is a linear relationship between the two variables (P-value is below 0.05), however, this line is not a good fit because the residuals do not have constant variance nor are they approximately normal. This would imply that the error terms do not have constant variance nor are they normally distributed. 
+
+## Transformation on Y
+
+In an effort to fix the variance, and perhaps normality, a transformation of $Y^\lambda$ will be done.
+
+```{r}
+boxCox(pluton.lm)
+```
+
+
+The box cox method suggests that $\lambda=0.5$ will be useful.
+
+Therefore our updated model becomes,
+
+$$
+Y'_i= \beta_0 + \beta_1X_i + \epsilon_i \\ 
+\text{where} \ Y'= \sqrt{Y}   \\
+\text{and} \ \epsilon_i \sim N(0, \sigma^2) 
+$$
+
+```{r, warning=FALSE}
+pluton2$sqrtAlphaCount <- pluton2$AlphaCount^(1/2)
+ggplot(data = pluton2, aes(x = PlutoniumActivity, y = sqrtAlphaCount)) + 
+  geom_point(color='red') +
+  geom_smooth(method = "loess", se = FALSE, color="red") +
+  xlab("sqrt(Plutonium Activity) pCi g") +
+  ylab("Alpha Count per sec") +
+  ggtitle("Transfomed data where Y'=sqrt(Y)")
+```
+
+
+The plot with the transformed Y suggests that the variance of the error terms have improved. The residual vs. fitted values shows this as well.  
+
+```{r}
+pluton2.lm <- lm(sqrtAlphaCount ~ PlutoniumActivity, data=pluton2)
+pander(summary(pluton2.lm))
+par(mfrow=c(1,2))
+plot(pluton2.lm, which=1:2)
+```
+
+Also, normality has improved greatly as well, however, it is clear that there is no longer a linear association between $Y'$ and $X$.
+
+
+## Transformation on Y and X
+
+A transformation on X should hopefully restore linearity. Based on the shape of the graph the transformation $X'=\sqrt{X}$ might be helpful. 
+
+The current model under consideration is,
+
+$$
+Y'_i= \beta_0 + \beta_1X'_i + \epsilon_i    \\ 
+\text{where} \ X'=\sqrt{X}                   \\
+\text{and} \ Y'= \sqrt{Y}                     \\
+\text{and} \ \epsilon_i \sim N(0, \sigma^2) 
+$$
+
+```{r, warning=FALSE}
+pluton2$sqrtPlutoniumActivity <- pluton2$PlutoniumActivity^(1/2)
+
+ggplot(data = pluton2, aes(x = sqrtPlutoniumActivity, y = sqrtAlphaCount)) + 
+  geom_point(color='red') +
+  geom_smooth(method = "lm", se = TRUE, color="red") +
+  xlab("sqrt(Plutonium Activity) pCi g") +
+  ylab("sqrt(Alpha Count per sec)") +
+  ggtitle("Transformed data with Confidence Bands and where Y'=sqrt(Y) and X'=sqrt(X)")
+```
+
+
+```{r}
+
+pluton3.lm <- lm(sqrtAlphaCount ~ sqrtPlutoniumActivity, data=pluton2)
+pander(summary(pluton3.lm))
+par(mfrow=c(1,2))
+plot(pluton3.lm, which=1:2)
+```
+
+
+## Final Check on Assumptions 
+
+The transformation on X does help to fix linearity, However the plots above now show that constant variance and normality may be an issue again. 
+
+```{r}
+pander(bptest(pluton3.lm, studentize=FALSE))
+```
+
+The p-score of the Breusch-Pagan test is just below the level of significance of 0.05, implying that variance is not constant at the 95% confidence level.
+
+Although variance is not constant It is not an extreme issue. We will need to keep in mind that there is more variability at the ends of our scope. 
+
+To test for normality we can look at the coefficient of correlation between the ordered residuals and their expected values under normality.
+
+Using a significance level of 0.05, the decision rule is if $\rho$ > .957 conclude the error terms are approximately normally distributed. Otherwise conclude the alternative. 
+
+```{r, include=FALSE}
+pluton.qq <- qqnorm(pluton3.lm$residuals)
+qqline(pluton3.lm$residuals)
+```
+
+```{r}
+cor(pluton.qq$x, pluton.qq$y)
+```
+
+Since .985 > .957, we can conclude that the error terms are approximately normally distributed. 
+
+A sequence or time plot does not lead to any doubt in the independence of the error terms. 
+
+```{r}
+plot(pluton2$PlutoniumActivity, type='b', pch=16, cex=0.8, main="Sequence plot of Y on X")
+```
+
+The only real departure from our model is constant variance. For our purposes today this model will still be sufficient and allow us to make needed predictions and inferences.   
+
+## Inferences
+
+Now that we have accepted this model our estimated function relation will be the following, 
+
+$$
+\hat{Y'} = 0.073 + 0.0573X'
+$$
+
+But it can also be expressed as,
+
+$$
+\hat{Y} = (0.073 + 0.0573 \sqrt{X})^2
+$$
+
+A graph of the original can be seen as 
+
+```{r, warning=FALSE}
+ggplot(data = pluton2, aes(x = PlutoniumActivity, y = AlphaCount)) + 
+  geom_point(color='red') +
+  stat_function(fun = function(x) (.07301+.05731*sqrt(x))^2) +
+  geom_smooth(method = "loess", se = FALSE, color="red") +
+  xlab("Plutonium Activity pCi per g") +
+  ylab("Alpha Count per sec") +
+  ggtitle("Original data with Converted Regression Line and Lowess Curve")
+```
+
+Below are the confidence intervals for $\beta_0$ and $\beta_1$. 
+
+```{r}
+pander(confint(pluton3.lm), caption = "95% Confidence Intervals for Betas")
+```
+
+Due to the transformation of $X'$ and $Y'$ it is difficult to comprehend these numbers in the original units. 
+
+However a derivative of $\hat{Y} = (0.073 + 0.0573 \sqrt{X})^2$ could help to show the rate of change at any given point. Below is the derivative along with its evaluation at 4 pCi per g.
+ 
+$$
+\frac{d \hat{Y}}{dX} = \frac{.00418 + .00328 \sqrt{X} }{ \sqrt X}   \\
+\frac{d \hat{Y}}{dX} = .00537 \ \ \ \text{at Plutonium activity of 4 pCi/g} \ 
+$$
+
+Below is a table of the confidence interval and also a prediction interval for $Y_h'$ when $X_h'=2$ or when $X_h=4$.   
+
+```{r}
+pander(predict(pluton3.lm, data.frame(sqrtPlutoniumActivity=2), interval="confidence")^2, caption = "95% Confident Interval at Pluntium Activity of 4")
+```
+
+```{r}
+pander(predict(pluton3.lm, data.frame(sqrtPlutoniumActivity=2), interval="prediction")^2, caption="95% Prediction Interval at Pluntium Activity of 4")
+
+#predict(pluton3.lm, data.frame(PlutoniumActivity=4), interval="prediction")
+```
+
+A graph is given below to visualize these limits.
+
+```{r, warning=FALSE}
+ggplot(data = pluton2, aes(x = PlutoniumActivity, y = AlphaCount)) + 
+  geom_point(color='black') +
+  stat_function(fun = function(x) (.07301+.05731*sqrt(x))^2) +
+  stat_function(fun = function(x)  .03128, color="blue", linetype="dashed") +
+  stat_function(fun = function(x)  .03935, color="blue", linetype="dashed") +
+  stat_function(fun = function(x)  .01822, color="green", linetype="dashed") +
+  stat_function(fun = function(x)  .05771, color="green", linetype="dashed") +
+  geom_vline(xintercept=4, linetype="dotted") +
+  xlab("Plutonium Activity pCi per g") +
+  ylab("Alpha Count per sec") +
+  ggtitle("Original Data plotted with Confidence Limits (blue) and Prediction Limits (green)")
+```
+
+

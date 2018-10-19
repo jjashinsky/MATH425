@@ -1,0 +1,527 @@
+---
+title: "Hard Work Chapter 8"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+library(mosaic)
+library(ggplot2)
+```
+
+<style>
+
+</style>
+
+## Instructions
+
+1. Study Sections 8.2-8.6 -- "Regression Models for Quantitative and Qualitative Predictors."    
+
+2. Attempt and submit at least <span id=points style="padding-left:0px;">{44}</span> Hard Work Points by Saturday at 11:59 PM.    
+<span id=note>Over <span id=points style="padding-left:0px;">{52}</span> gets you {+1} Final Exam Point.</span>    
+
+
+## Reading Points <span id=headpoints>{25} Possible</span>
+
+### Section 8.2 <span id=recpoints>{7}</span><span id=report>{ 6 / 7 }</span>
+
+### Section 8.3 <span id=recpoints>{7}</span><span id=report>{ 6 / 7 }</span>
+
+### Section 8.4 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+### Section 8.5 <span id=recpoints>{5}</span><span id=report>{ 5 / 5 }</span>
+
+### Section 8.6 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+
+
+## Theory Points <span id=headpoints>{7} Possible</span>
+
+
+### Problem 8.14 <span id=points>{2}</span><span id=report>{ 2 / 2 }</span>
+
+There is no problem with the model and is fair to both genders. The positive coefficient means that boys have a higher learner time. If the codes were switched $b_2$ will be negative, resulting in the same effect. A different coding scheme would have to be interpreted differently but would ultimately result in being similar to each other.  
+ 
+### Problem 8.17 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span> 
+Refer to the regression models (8.33) and (8.49). Would the conclusion that $\beta_2=0$ have the same implication for each of these models? Explain.
+
+It would not have the same implication because the interaction term may still have an effect that would create two different lines. 
+
+Assuming that the null, in that $\beta_2=0$, the reduced model of (8.49) would be, 
+
+$$
+Y_i = \beta_0 + \beta_1 X_{i1} + \beta_3X_{i1}X_{i2} + \epsilon_i
+$$
+
+And the response functions would be. 
+
+$$
+E \{ Y \} = \beta_0 + \beta_1X_1   \\
+E \{ Y \} = \beta_0 + (\beta_1 + \beta_3)X_1
+$$
+
+We can see that the intercepts are the same but the slopes are different for each line. 
+
+
+
+
+### Problem 8.21 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span> 
+
+Using the model 
+
+$$
+E \{ Y \}=\beta_0 + \beta_1X_1 + \beta_2X_2 + \beta_3X_3
+$$
+**a.** 
+
+Response function for Hard hat
+$$
+E \{ Y \}= (\beta_0 + \beta_2) + \beta_1X_1
+$$
+Response function for Bump hat
+$$
+E \{ Y \}= (\beta_0 + \beta_3) + \beta_1X_1 
+$$
+
+Response function for None
+$$
+E \{ Y \}= \beta_0 + \beta_1X_1
+$$
+
+**b.**
+
+To test to see if wearing a bump hat reduced the expected severity of injury as compared with wearing no protection.
+
+$$
+H_0: \beta_3 = 0  \\
+H_a: \beta_3 \ne 0
+$$
+
+To see if the expected severity of the injury the same when wearing a hard hat as when wearing a bump hat.
+
+$$
+H_0: \beta_2 = \beta_3  \\
+H_a: \beta_2 \ne \beta_3  
+$$
+
+### Problem 8.22 <span id=points>{1}</span><span id=report>{ / }</span> 
+
+
+
+
+## Application Points <span id=headpoints>{29} Possible</span>
+
+<a id=datalink style="font-size:.9em;" target="_blank" href=http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/index.html>Data Files</a>
+
+### Problem 8.15 <span id=recpoints>{5}</span><span id=report>{ 5 / 5 }</span> 
+
+```{r}
+# Code to read in the data
+# It has to be merged from the 1.20 and 8.15 data files.
+p1.20 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR20.txt", header=FALSE)
+p8.15 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%208%20Data%20Sets/CH08PR15.txt", header=FALSE)
+p15 <- cbind(p1.20,p8.15)
+
+# Give it nice column names for conevience:
+colnames(p15) <- c("Y","X1","X2")
+
+```
+
+**a.** Explain the meaning of all the regression coefficients in the model. 
+
+The model under consideration is 
+
+$$
+Y_i = \beta_0 + \beta_1X_{i1} + \beta_2X_{i2} + \epsilon_i   \\
+X_{i1}=\text{the number of copiers serviced}   \\
+X_{i2}=\text{type of copier} \\
+\beta_0=\text{minutes spent when number of large copier model is zero} \\
+\beta_1=\text{increase in minutes for every increase in one of either copier type}  \\
+\beta_2=\text{change in intercept for small copier models}
+$$
+
+**b.** Fit the regression model and state the estimated regression function. 
+
+```{r}
+p8.15.lm <- lm(Y ~ X1 + X2, data=p15)
+
+summary(p8.15.lm)
+```
+
+$$
+\hat{Y_i} = -0.9225 + 15.0461X_{i1} + 0.7587X_{i2}
+$$
+
+
+**c.** Estimate the effect of copier model on mean service time with a 95% confidence interval. Interpret your interval estimate. 
+
+```{r}
+confint(p8.15.lm)
+```
+
+The confidence interval for $\beta_2$ would be the interval for the effect change in the mean of caller time between the models. 
+
+Effectively the interval implies that $\beta_3=0$ because 0 is contained in the interval, meaning that copier model does not have any effect in this current model. 
+
+**d.** Why would the analyst wish to include $X_1$, number of copiers, in the regression model when interest is in estimating the effect of type of copier model on service time. 
+
+Without including $X_1$ the information of that the copier model tells would be highly skewed. Large models might take more time but if only one is serviced it very well could take less time than 10 smaller models being serviced. The number of copiers is needed to make a fair estimate and to see effect of the model. 
+
+Without $X_1$ this would just be an ANOVA test and not a regression. 
+
+**e.**
+
+Obtain the residuals and plot them against $X_1, X_2$. Is there any indication that an interaction term in the regression model would be helpful?
+
+```{r}
+b <- p8.15.lm$coefficients
+plot(Y ~ X1, data=p15, col=c("blue", "red"))
+abline(b[1], b[2], col="blue")
+abline(b[1]+b[3], b[2], col="red")
+```
+
+```{r}
+plot(p8.15.lm$residuals ~ I(X1*X2), data=p15)
+```
+
+An interaction term does appear to be needed, because there is a little bit of a pattern in the residuals that the interaction term could explain. 
+
+The residuals plotted against $X_1X_2$ implies that adding the interaction term may be able to provide a better model for the data. 
+
+
+### Problem 8.16 <span id=points>{5}</span><span id=report>{  /  }</span> 
+
+```{r}
+# Code to read in the data
+# It has to be merged from the 1.19 and 8.16 data files.
+p1.19 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR19.txt", header=FALSE)
+p8.16 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%208%20Data%20Sets/CH08PR16.txt", header=FALSE)
+p16 <- cbind(p1.19, p8.16)
+# Give it nice column names for conevience:
+colnames(p16) <- c("Y","X1","X2")
+
+p16$X2 <- as.factor(p16$X2)
+```
+
+### Problem 8.19 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span> 
+
+```{r}
+# Use dataset p15 for this problem.
+```
+
+**a.** Fit the regression model (8.49) and state the estimated regression function. 
+
+```{r}
+p8.15.lm2 <- lm(Y ~ X1 + X2 + X1:X2, data=p15)
+summary(p8.15.lm2)
+```
+
+$$
+\hat{Y_i} = 2.8131 + 14.3394_{i1} + -8.1412X_{i2} + 1.7774X_{i1}X_{i2}
+$$
+
+**b.**
+
+Test whether the interaction term can be dropped from the model; use $\alpha=0.1$. State the alternatives, decision rules, and conclusion. What is the pvalue of the test? If the interaction term cannot be dropped from the model, describe the nature of the interaction effect.  
+
+$$
+H_0: \beta_3 = 0 \\
+H_a: \beta_3 \ne 0
+$$
+```{r}
+qt(1-.1/2, 41)
+```
+
+The decision rule is if $|t^*| \le 1.68023$, conclude the null, otherwise conclude the alternative. 
+
+Consider $1.824 > 1.68$, therefore we conclude the alternative, in that $\beta_3 \ne 0$. 
+
+The interpretation is that the change in slope from the large model to small model is 1.7774. In other words the slope for small models is $\beta_1 + \beta3$ where as the slope for large models is just $\beta_1$.  
+
+
+
+### Problem 8.20 <span id=points>{3}</span><span id=report>{ 3 / 3 }</span> 
+
+```{r}
+# Use dataset p16 for this problem.
+```
+
+
+**a.** Fit the regression model (8.49) and state the estimated regression function. 
+
+```{r}
+p8.20.lm <- lm(Y ~ X1 + X2 + X1:X2, data=p16)
+summary(p8.20.lm)
+b <- p8.20.lm$coefficients
+```
+
+$$
+\hat{Y_i} = 3.226 + -0.00276X_{i1} + -1.6496X_{i2} + 0.06225X_{i1}X_{i2}
+$$
+
+**b.** Test whether the interaction term can be dropped from the model; use $\alpha=0.05$. State the alternatives, decision rules, and conclusion. What is the pvalue of the test? If the interaction term cannot be dropped from the model, describe the nature of the interaction effect.  
+
+$$
+H_0: \beta_3 = 0 \\
+H_a: \beta_3 \ne 0
+$$
+
+```{r}
+qt(1-.05/2, 116)
+```
+
+If $|t^*| < 1.9806$ conclude the null, otherwise conclude the alternative. 
+
+Since, $2.350 > 1.9806$ we conclude the alternative, in that the interaction term is not zero.  
+
+This means that the slope term increases by .06225 if the student has declared a major at the time of the application. 
+
+```{r}
+ggplot(data = p16, aes(x = X1, y = Y)) + geom_point()  + aes(colour = X2) + facet_wrap(~X2, ncol = 4)  + stat_smooth(method = lm) + labs(title = "")
+```
+
+### Problem 8.24 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span> 
+
+```{r}
+# Code to read in the data
+p24 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%208%20Data%20Sets/CH08PR24.txt", header=FALSE)
+
+# Give it nice column names for conevience:
+colnames(p24) <- c("Y","X1","X2")
+```
+
+**a.** Plot the sample data for the two populations as a symbolic scatter plot. Does the regression relation appear to be the same for the two populations? 
+
+```{r}
+ggplot(data = p24, aes(x = X1, y = Y)) + geom_point()  + aes(colour = X2) + labs(title = "")
+```
+
+There appears to be two different regression functions for each type of lots. 
+
+**b.** Test for the identity of the regression functions for the dwellings on corner lots and dwellings in the other locations; control the risk of Type I error at .05. State the alternatives, decision rule, and conclusion. 
+
+See page 264-265
+
+
+$$
+H_0: \beta_2 = \beta_3 = 0   \\
+H_a: \ \text{noth both} \ \beta_2 = 0 \ \text{and} \ \beta_3 = 0
+$$
+
+```{r}
+qf(.95, 2, 60)
+```
+
+If $F^* \le 3.1504$ conclude the null, otherwise conclude the alternative. 
+
+because $F^* = 18.683 > 3.1504$ we conclude the alternative.  
+
+```{r}
+full <- lm(Y ~ X1 + X2 + X1:X2, data=p24)
+reduced <- lm(Y ~ X1, data=p24)   # reduced model under the null
+
+anova(reduced, full)
+```
+
+
+**c.**
+
+```{r}
+ggplot(data = p24, aes(x = X1, y = Y)) + 
+  geom_point()  + 
+  aes(colour = X2) + 
+  stat_function(fun = function(x) (-126.9052 + 2.7759*x)) +
+  stat_function(fun = function(x) ((-126.9052 + 76.0215) + (2.7759 + -1.1075)*x) )
+    
+```
+
+Non corner lots have a much higher selling price than the corner properties, but only when the assessed valuation gets larger. When assessed valuation is between 68 and 70 is when the lots have less variation. 
+
+
+### Problem 8.25 <span id=recpoints>{3}</span><span id=report>{ 2 / 3 }</span> 
+
+```{r}
+# Code to read in the data
+p25 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%206%20Data%20Sets/CH06PR09.txt", header=FALSE)
+
+# Give it nice column names for conevience:
+colnames(p25) <- c("Y","X1","X2","X3")
+```
+
+**a.** Fit regression model (8.59) using the number of cases shipped $(X_1)$ and the binary variable $(X_3)$ as predictors. 
+
+The model:
+
+$$
+Y_i= \beta_0 + \beta_1X_{i1} + \beta_2X^2_{i1} + \beta_3X_{i2} + \beta_4X_{i1}X_{i2} + \beta_5X^2_{i1}X_{i2} + \epsilon_i
+$$
+
+$$
+E \{Y \} = \beta_0 + \beta_1X_1 + \beta_2X^2_1   \ \ \ \text{when} \ X_2=0
+$$
+
+$$
+E \{Y \} = (\beta_0 + \beta_3) + (\beta_1 + \beta_4)X_1 + (\beta_2 + \beta_5)X^2_1   \ \ \ \text{when} \ X_2=1
+$$
+
+```{r}
+p25.lm<-lm(Y~ X1 + I(X1^2) + X3 + X1:X3 + I(X1^2):X3, data=p25)
+b <- p25.lm$coefficients
+```
+
+```{r}
+plot(Y ~ X1, col = factor(X3), data=p25, pch=19)
+curve(b[1] + b[2]*x + b[3]*x^2, add=TRUE, lwd=2)
+curve((b[1]+b[4]) + (b[2]+b[5])*x + (b[3]+b[6])*x^2, lwd = 2,col="red", add=TRUE)
+```
+
+Incase they were asking for the other model where $x_{i1}$ was used to counter multilinearity problems. 
+
+The model:
+
+$$
+Y_i= \beta_0 + \beta_1x_{i1} + \beta_2x^2_{i1} + \beta_3X_{i2} + \beta_4x_{i1}X_{i2} + \beta_5x^2_{i1}X_{i2} + \epsilon_i  \\ 
+\text{where} \ x_{i1}= X_{i1} - \bar{X_1} 
+$$
+
+$$
+E \{Y \} = \beta_0 + \beta_1x_1 + \beta_2x^2_1   \ \ \ \text{when} \ X_2=0
+$$
+
+$$
+E \{Y \} = (\beta_0 + \beta_3) + (\beta_1 + \beta_4)x_1 + (\beta_2 + \beta_5)x^2_1   \ \ \ \text{when} \ X_2=1
+$$
+
+
+```{r}
+p25.lm<-lm(Y~ I(X1-302693.1) + I((X1-302693.1)^2) + X3 + I(X1-302693.1):X3 + I((X1-302693.1)^2):X3, data=p25)
+b <- p25.lm$coefficients
+```
+
+```{r}
+plot(Y ~ X1, col = factor(X3), data=p25, pch=19)
+curve(b[1] + b[2]*(x-302693.1) + b[3]*(x-302693.1)^2, add=TRUE, lwd=2)
+curve((b[1]+b[4]) + (b[2]+b[5])*(x-302693.1) + (b[3]+b[6])*(x-302693.1)^2, lwd = 2,col="red", add=TRUE)
+```
+
+**b.** Test whether or not the interaction terms and quadratic term can be dropped from the model; use $\alpha=0.05$. State the alternatives, decision rule, and conclusion. What is the p-value of the test? 
+
+
+$$
+H_0: \beta_2 = \beta_3 = \beta_4 = \beta_5 = 0   \\
+H_a: \ \text{not all} \ \beta_k \ \text{in} \ H_0 \ \text{equal zero} 
+$$
+
+Using page 267 the critical value is, $F^* \sim F(p-q, n-p)$ where $p=6$ is the number of coefficents and $q=2$ is the number of coefficents in the reduced model, and $n=52$ is the sample size. 
+```{r}
+qf(.95, 4, 46)
+```
+
+If $F^* \le 2.574035$ conclude the null, otherwise conclude the alternative. 
+
+
+Since $F^* = 23.6 > 2.574035$, we conclude the alternative, in that at least one of $\beta_k$ is not equal to zero. The p-value is 1.16e-10. 
+
+```{r}
+full <-lm(Y~ X1 + I(X1^2) + X3 + X1:X3 + I(X1^2):X3, data=p25)
+reduced <- lm (Y ~ X1, data=p25)
+anova(reduced, full)
+```
+
+
+
+### Project 8.36 <span id=points>{6}</span><span id=report>{ / }</span> 
+
+**Note**: You can swap 8.36 out for any of 8.37-8.42 as well if a different project interests you more.
+
+```{r}
+# Code to read in the data
+
+# Select your Project file. Change the APPENC01.txt to be any of:
+project <- "APPENC01.txt"
+# APPENC02.txt, APPENC03.txt, APPENC04.txt, ... 
+# depending on which Project problem you select. 
+
+projdata <- read.table(paste0("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Appendix%20C%20Data%20Sets/",project), header=FALSE)
+
+# Give it nice column names for conevience:
+#colnames(projdata) <- c(you'll have to fill this in yourself)
+```
+ 
+
+
+
+<style>
+#points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+
+#rrecpoints {
+  font-size:1em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+
+
+
+#report {
+  font-size:.7em;
+  padding-left:15px;
+  font-weight:normal; 
+  color:#5a5a5a;
+}
+
+
+</style>
+
+
+<footer>
+</footer>
+
+
+
+ 
+
+ 
+
+ 
+
+ 

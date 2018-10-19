@@ -1,0 +1,85 @@
+---
+title: "Class Activity"
+output: 
+  html_document:
+    code_folding: hide
+    theme: cerulean
+---
+
+
+```{r}
+sdata <- read.table("Sdata.csv", sep=" ", header=TRUE)
+```
+
+```{r, fig.height=20, fig.width=20}
+pairs(sdata)
+```
+
+```{r}
+plot(Y ~ X13, data=sdata)
+lm1 <- lm(Y ~ X13 + I(X13^2), data=sdata)
+b <- coef(lm1)
+curve(b[1] + b[2]*x + b[3]*x^2, add=TRUE)
+summary(lm1)
+```
+
+```{r, fig.height=20, fig.width=20}
+pairs(cbind(R=lm1$res, sdata))
+```
+
+
+```{r}
+lm2 <- lm(Y ~ X13 + I(X13^2) + X2, data=sdata)
+par(mfrow=c(1,2))
+plot(lm2, which=1:2)
+```
+
+```{r, fig.height=20, fig.width=20}
+pairs(cbind(R=lm2$res, sdata), col=as.factor(sdata$X10))
+```
+
+```{r}
+lm3 <- lm(Y ~ X13 + I(X13^2) + X2 + I(X10==2) + I(X10==3) + I(X10==4), data=sdata)
+summary(lm3)
+par(mfrow=c(1,2))
+plot(lm3, which=1:2)
+```
+
+```{r}
+lm4 <- lm(Y ~ X13 + I(X13^2) + X2 + I(X10==2) + I(X10==3), data=sdata)
+summary(lm4)
+par(mfrow=c(1,2))
+plot(lm4, which=1:2)
+```
+
+```{r}
+lm5 <- lm(Y ~ X13 + I(X13^2) + X2 + I(X10==2) + I(X10==3) + I(X10==2):X2, data=sdata)
+summary(lm5)
+par(mfrow=c(1,2))
+plot(lm5, which=1:2)
+```
+
+$$
+ Y_i = \beta_0 + \beta_1 X_{13} + \beta_2 X_{13}^2 + \beta_3 X_2 + \beta_4 X_{10==2} + \beta_5 X_{10==3} + \epsilon_i
+$$
+Our estimates for the $\beta$'s in the above model are as follows:
+
+```{r}
+confint(lm4, level=.99)
+```
+
+
+| Term      | Estimate   | Lower Bound | Upper Bound |
+|-----------|------------|-------------|-------------|
+| $\beta_0$ | -6.076582  |             |             |
+| $\beta_1$ | -0.299190  |             |             |
+
+
+
+
+
+```{r, fig.height=20, fig.width=20}
+pairs(cbind(R=lm4$res, sdata), col=as.factor(sdata$X11))
+pairs(cbind(R=lm4$res, sdata), col=as.factor(sdata$X12))
+pairs(cbind(R=lm4$res, sdata), col=as.factor(sdata$X10))
+```

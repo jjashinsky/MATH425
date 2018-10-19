@@ -1,0 +1,656 @@
+---
+title: "Hard Work 12"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+library(plotly)
+library(mosaic)
+library(ggplot2)
+library(alr3)
+library(MASS)
+```
+
+
+<style>
+
+</style>
+
+## Instructions
+
+1. Study Sections **{7.6, 8.1, 10.5, 11.2}** -- "Multicollinearity and Polynomial Models."
+
+2. Attempt and submit at least <span id=points style="padding-left:0px;">{50}</span> Hard Work Points by Saturday at 11:59 PM.    
+<span id=note>Over <span id=points style="padding-left:0px;">{65}</span> gets you {+1} Final Exam Point.</span>    
+<span id=note>Over <span id=points style="padding-left:0px;">{80}</span> gets you {+2} Final Exam Points.</span>    
+
+
+## Reading Points <span id=headpoints>{23} Possible</span>
+
+### Section 7.6 <span id=rrecpoints>{7}</span><span id=report>{ 6 / 7 }</span>
+
+### Section 8.1 <span id=rrecpoints>{7}</span><span id=report>{ 7 / 7 }</span>
+
+### Section 10.5 <span id=rrecpoints>{4}</span><span id=report>{ 2 / 2 }</span>
+
+### Section 11.2 <span id=rrecpoints>{5}</span><span id=report>{ 1 / 2 }</span>
+
+
+
+
+
+## Theory Points <span id=headpoints>{4} Possible</span>
+
+### Problem 7.23 <span id=points>{2}</span><span id=report>{ 2 / 2 }</span>
+
+The high coefficient of multiple determination would imply that they have a good fit. Multicollinearity generally does not have that much of an impact on the ability to to find a good fit. 
+
+However, it still makes it difficult to interpret the effects of each individual variable. This is because adding one correlated variable can drastically change the coefficient of another variable. 
+ 
+### Problem 8.3 <span id=points>{2}</span><span id=report>{ 2 / 2 }</span>
+
+It can be difficult to say without seeing the actual data but I would suppose that the analyst did over-fit the data. Consider the fact that the sample size is only 7. I high order polynomial can easily be fitted to match each point. 
+
+A linear or quadratic might be able to just as good of a job and will most likely validate much better than the high order polynomial. 
+
+Seeing the adjusted R2 would probably be somewhat lower than R2. This would indicate that as more parameters are added the ability to explain the data might stay around the same.  
+
+
+## Application Points <span id=headpoints>{35} Possible</span>
+
+
+<a id=datalink style="font-size:.9em;" target="_blank" href=http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/index.html>Data Files</a>
+
+
+### Problem 8.1 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span>
+
+Prepare a contour plot of the response function $E \{ Y \} = 140+4x_1^2 - 2x_2^2 + 5x_1x_2$.
+
+Below is the contour plot. Any negative expected values are plotted in blue while and positive expected values are plotted in green. 
+
+```{r}
+x<-seq(-10,10,length=100)
+y<-seq(-10,10,length=100)
+z<-outer(x,y,function(x,y) 140+(4*x^2)-(2*y^2)+(5*x*y) )
+contour(x,y,z,levels=c(50, 100, 125, 135, 150, 175, 200), xlab="X1", ylab="X2", main="Contour Plot of 140+4X1^2 - 2X2^2 + 5X1*X2", col="green")
+contour(x,y,z,levels=c(0, -50, -100, -125, -135), add=TRUE, col="blue")
+```
+
+
+For the sake of learning more code here is also a 3D plot of the same surface.  
+
+```{r, warning=FALSE}
+x<-seq(-10,10,length=100)
+y<-seq(-10,10,length=100)
+z<-outer(x,y,function(x,y) 140+(4*x^2)-(2*y^2)+(5*x*y) )
+
+data <- data.frame(x, y, z)
+
+p <- plot_ly(data, x = ~x, y = ~y, z = ~z, type = 'surface', mode = 'lines+markers',
+        line = list(width = 6))
+        #marker = list(size = 3.5, cmin = -20, cmax = 50))
+p
+```
+
+### Problem 8.4 <span id=recpoints>{8}</span><span id=report>{ 7 / 8 }</span>
+
+
+```{r}
+# Here is generic code that would read in any "Problem" from any "Chapter":
+
+Chapter <- 8 #change this to the chapter you want
+Problem <- 4 #change this to the problem you want
+
+#Change pWhatever.Whatever to be p11.11 or whatever you want.
+p8.4 <- read.table("http://users.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR27.txt", header=FALSE)
+
+# Give it nice column names for conevience:
+# Be sure to change pWhatever.Whatever to p11.11 or whatever you used above.
+colnames(p8.4) <- c("Y","X1")
+
+```
+
+
+**a.**
+
+Fit the data to the model 
+
+$$
+Y_i = \beta_0 + \beta_1x_i + \beta_{11}x_i^2 + \epsilon_i,  \ \ \text{where} \ x_i = X_i - \bar{X}.  
+$$
+
+```{r}
+p8.4.lm <- lm(Y ~ I(X1-mean(p8.4$X1))  + I((X1-mean(p8.4$X1))^2), data=p8.4)
+summary(p8.4.lm)
+```
+
+```{r}
+b<-p8.4.lm$coefficients
+plot(Y ~ I(X1-mean(p8.4$X1)), data=p8.4, main="Plotted with centered X1")
+curve(b[1] + b[2]*x + b[3]*x^2, add=TRUE)
+```
+
+```{r}
+plot(Y ~ X1, data=p8.4, main="Plotted in original units")
+curve(b[1] - b[2]*mean(p8.4$X1) + b[3]*mean(p8.4$X1)^2 + (b[2]-2*b[3]*mean(p8.4$X1))*x + b[3]*x^2, add=TRUE)
+```
+
+R2 is .7632 which is decent but not great. I linear line might be able to do just as well as the quadratic but it appears to fit well. Variance might be a bit of an issue.   
+
+
+**b.**
+
+To test for regression relation see page 226.
+```{r}
+qf(1-.05, 2, 57)
+```
+
+$H_0: \beta_1 = \beta_11 = 0$
+
+$H_a: \text{at least one} \ \beta_k \ne 0$
+
+
+If $F* \le 3.158843$, conclude the null. Otherwise conclude the alternative.
+
+Since $F* = 91.84 > 3.158843$ we conclude the alternative in that there is a regression relation. 
+
+**c.** 
+
+```{r}
+predict(p8.4.lm, data.frame(X1=48), interval="confidence")
+```
+
+**d.**
+
+```{r}
+predict(p8.4.lm, data.frame(X1=48), interval="prediction")
+```
+
+```{r}
+plot(Y ~ X1, data=p8.4, main="Confidence (blue) and prediction limits (red) at X1=48")
+curve(b[1] - b[2]*mean(p8.4$X1) + b[3]*mean(p8.4$X1)^2 + (b[2]-2*b[3]*mean(p8.4$X1))*x + b[3]*x^2, add=TRUE)
+abline(h=96.28436, col="blue")
+abline(h=102.2249, col="blue")
+abline(h=82.9116, col="firebrick")
+abline(h=115.5976, col="firebrick")
+abline(v=48)
+```
+
+**e.**
+
+$$
+H_0: \beta_{11} = 0 \\
+H_a: \beta_{11} \ne 0
+$$
+
+```{r}
+qt(1-.05/2, 57)
+```
+
+If $|t^*| < 2.002465$ conclude the null, otherwise conclude the alternative. 
+
+Since, $1.776 < 2.002465$ we conclude the null. The quadratic term is not needed in the model.
+
+**f.**
+
+In the original units the fitted regression becomes
+
+$$
+\hat{Y} = b'_0 + b_1'X + b'_{11}X^2 \ \ \text{where:}  \\
+b_0' = b_0 -b_1\bar{X} + b_{11}\bar{X}^2  \\
+b_1' = b_1 - 2b_b{11}\bar{X}   \\
+b'_{11} = b_{11}
+$$
+
+With values for b the function becomes 
+
+$$
+\hat{Y} = 207.35  + -2.9643 X + 0.0148X^2
+$$
+
+**g.**
+
+Correlation between X and X^2.
+```{r}
+cor(p8.4$X1, (p8.4$X1)^2)
+```
+
+Correlation between x and x^2.
+```{r}
+cor((p8.4$X1-mean(p8.4$X1)), (p8.4$X1-mean(p8.4$X1))^2)
+```
+
+Using a centered variables greatly helps reduce correlation and thereby multicollinearity. 
+
+
+### Problem 8.5 <span id=recpoints>{5}</span><span id=report>{ 4 / 5 }</span>
+
+**a.**
+
+```{r}
+plot(p8.4.lm$residuals ~ I(X1-mean(p8.4$X1)), data=p8.4)
+plot(p8.4.lm, which=1:2)
+```
+
+The residuals are pretty scattered. There doesn't appear to much of a pattern anywhere. Variance is slightly off but it shouldn't be to much of a concern. 
+
+
+**b.**
+
+```{r}
+length(unique(p8.4$X1))
+qf(1-.05, 32-2, 60-32)
+```
+
+If $F^* \le 1.868709$ then we conclude the null, otherwise we conclude the alternative.
+
+```{r}
+pureErrorAnova(p8.4.lm)
+```
+
+.9509 < 1.868709, therefore the regression model is a good fit for the data. 
+
+The assumptions for this test is that Y for given X are (1) independent and (2) normally distributed, and that (3) the distributions of Y have the same variance. 
+
+(1) and (3) should be met but (2) could be questionable.  
+
+**c.**
+
+```{r}
+p8.4.lm2 <- lm(Y ~ I(X1-mean(p8.4$X1))  + I((X1-mean(p8.4$X1))^2) + I((X1-mean(p8.4$X1))^3), data=p8.4)
+summary(p8.4.lm2)
+```
+
+```{r}
+b2<-p8.4.lm2$coefficients
+plot(Y ~ I(X1-mean(p8.4$X1)), data=p8.4, main="Plotted with centered X1")
+curve(b2[1] + b2[2]*x + b2[3]*x^2 + b2[4]*x^3, add=TRUE)
+```
+
+
+$$
+H_0: \beta_{111} = 0 \\
+H_a: \beta_{111} \ne 0
+$$
+
+```{r}
+qt(1-.05/2, 57)
+```
+
+If $|t^*| < 2.002465$ conclude the null, otherwise conclude the alternative. 
+
+Since, $0.7193 < 2.002465$ we conclude the null. The cubic term is not needed in the model.
+
+This is consistent with our answer in part (b) because the simpler model was able to fit the data just as well as this model. The third interaction term is not needed. 
+
+### Problem 8.6 <span id=recpoints>{8}</span><span id=report>{ 7 / 8}</span>
+
+
+```{r}
+# Here is generic code that would read in any "Problem" from any "Chapter":
+
+Chapter <- 8 #change this to the chapter you want
+Problem <- 6 #change this to the problem you want
+
+#Change pWhatever.Whatever to be p11.11 or whatever you want.
+p8.6 <- read.table("http://users.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%208%20Data%20Sets/CH08PR06.txt", header=FALSE)
+
+# Give it nice column names for conevience:
+# Be sure to change pWhatever.Whatever to p11.11 or whatever you used above.
+colnames(p8.6) <- c("Y","X1")
+
+```
+
+
+**a.**
+
+Fit the data to the model 
+
+$$
+Y_i = \beta_0 + \beta_1x_i + \beta_{11}x_i^2 + \epsilon_i,  \ \ \text{where} \ x_i = X_i - \bar{X}.  
+$$
+
+```{r}
+p8.6.lm <- lm(Y ~ I(X1-mean(X1))  + I((X1-mean(X1))^2), data=p8.6)
+summary(p8.6.lm)
+```
+
+```{r}
+b<-p8.6.lm$coefficients
+plot(Y ~ I(X1-mean(p8.6$X1)), data=p8.6, main="Plotted with centered X1")
+curve(b[1] + b[2]*x + b[3]*x^2, add=TRUE, col="red")
+```
+
+```{r}
+plot(Y ~ X1, data=p8.6, main="Plotted in original units")
+curve(b[1] - b[2]*mean(p8.6$X1) + b[3]*mean(p8.6$X1)^2 + (b[2]-2*b[3]*mean(p8.6$X1))*x + b[3]*x^2, add=TRUE)
+```
+
+R2 is .8143 which is good for the most part.  
+
+
+**b.**
+
+To test for regression relation see page 226.
+```{r}
+qf(1-.01, 2, 24)
+```
+
+$H_0: \beta_1 = \beta_11 = 0$
+
+$H_a: \text{at least one} \ \beta_k \ne 0$
+
+
+If $F* \le 5.613591$, conclude the null. Otherwise conclude the alternative.
+
+Since $F* = 52.63 > 5.613591$ we conclude the alternative in that there is a regression relation. 
+
+**c.** 
+
+```{r, eval=FALSE}
+MSE <- 3.153^2 
+
+xb <- mean(p8.6$X1)
+X <- cbind(x=(p8.6$X1-xb), x2=(p8.6$X1-xb)^2)
+Xh <- c(10-xb, (10-xb)^2)
+s2 <- MSE * (t(Xh) %*% solve(t(X)%*%X) %*% Xh )
+s <- sqrt(s2)
+t <- qt(1-.1/6, 27)
+
+predict(p8.6.lm, data.frame(X1=10)) - t*s
+predict(p8.6.lm, data.frame(X1=10)) + t*s
+```
+
+```{r}
+
+predict(p8.6.lm, data.frame(X1=c(10,15,20)), interval="confidence", level=1-0.1/3)
+```
+
+
+**d.**
+
+```{r}
+predict(p8.6.lm, data.frame(X1=15), interval="prediction", level = .99)
+```
+
+**e.**
+
+$$
+H_0: \beta_{11} = 0 \\
+H_a: \beta_{11} \ne 0
+$$
+
+```{r}
+qt(1-.01/2, 24)
+```
+
+If $|t^*| < 2.79694$ conclude the null, otherwise conclude the alternative. 
+
+Since, $|-5.045| > 2.79694$ we conclude the alternative. The quadratic term cannot be dropped from the model.
+
+**f.**
+
+In the original units the fitted regression becomes
+
+$$
+\hat{Y} = b'_0 + b_1'X + b'_{11}X^2 \ \ \text{where:}  \\
+b_0' = b_0 -b_1\bar{X} + b_{11}\bar{X}^2  \\
+b_1' = b_1 - 2b_b{11}\bar{X}   \\
+b'_{11} = b_{11}
+$$
+
+With values for b the function becomes 
+
+$$
+\hat{Y} = -26.3254  + 4.87357 X + -0.1184X^2
+$$
+
+Its not required but the sake of curiosity here is how the centered variables reducted correlation. 
+
+Correlation between X and X^2.
+```{r}
+cor(p8.6$X1, (p8.6$X1)^2)
+```
+
+Correlation between x and x^2.
+```{r}
+cor((p8.6$X1-mean(p8.6$X1)), (p8.6$X1-mean(p8.6$X1))^2)
+```
+
+Using a centered variables greatly helps reduce correlation and thereby multicollinearity. 
+
+
+### Problem Births78 <span id=recpoints>{10}</span><span id=report>{ 8 / 10}</span>
+
+Find the best regression model that uses dayofyear to predict births.
+
+```{r, include=FALSE}
+
+BirthNew <- Births78
+
+for (i in 1:365){
+  if(BirthNew$wday[i]=="Mon" | BirthNew$wday[i]=="Tues" | BirthNew$wday[i]=="Wed" | BirthNew$wday[i]=="Thurs" | BirthNew$wday[i]=="Fri"){
+  BirthNew$weekend[i] <- 0
+  }
+  if(BirthNew$wday[i]=="Sat" | BirthNew$wday[i]=="Sun"){
+  BirthNew$weekend[i] <- 1
+  }
+  
+}
+
+
+for (i in 1:365){
+  if(BirthNew$wday[i]=="Mon" | BirthNew$wday[i]=="Tues" | BirthNew$wday[i]=="Wed" | BirthNew$wday[i]=="Thurs" | BirthNew$wday[i]=="Fri"){
+  BirthNew$sday[i] <- 0
+  }
+  if(BirthNew$wday[i]=="Sat"){
+  BirthNew$sday[i] <- 1
+  }
+  if(BirthNew$wday[i]=="Sun"){
+  BirthNew$sday[i] <- 2
+  }
+}
+
+
+BirthNew$weekend <- as.factor(BirthNew$weekend)
+BirthNew$sday <- as.factor(BirthNew$sday)
+
+```
+
+
+```{r}
+plot(births ~ dayofyear, data=Births78, col=Births78$wday, pch=16)
+legend("topleft", legend=levels(Births78$wday), lty=1, lwd=5, cex=0.7)
+```
+
+Sunday and Saturdays are clearly lower then every than the week days, with Sunday appearing to be the lower than Saturday.
+
+```{r}
+mean(Births78$dayofyear)
+```
+
+
+```{r}
+birthlm <- lm(births ~ I(dayofyear-183) + I((dayofyear-183)^2) + I((dayofyear-183)^3) + I((dayofyear-183)^4) + I((dayofyear-183)^5) + wday, data=Births78)
+summary(birthlm)
+```
+
+
+```{r}
+b<-birthlm$coefficients
+plot(births ~ I(dayofyear-183), data=Births78, col=Births78$wday, pch=16)
+curve(b[1] + b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+curve(b[1] +b[7]+ b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+curve(b[1] +b[8]+ b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+curve(b[1] +b[9]+ b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+curve(b[1] +b[10]+ b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+curve(b[1] +b[11]+ b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+curve(b[1] +b[12]+ b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+```
+
+
+```{r}
+birthlm2 <- lm(births ~ I(dayofyear-183) + I((dayofyear-183)^2) + I((dayofyear-183)^3) + I((dayofyear-183)^4) + I((dayofyear-183)^5) + weekend, data=BirthNew)
+summary(birthlm2)
+
+b<-birthlm2$coefficients
+plot(births ~ I(dayofyear-183), data=Births78, col=Births78$wday, pch=16)
+curve(b[1] + b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+curve(b[1] +b[7]+ b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5, add=TRUE)
+
+```
+
+```{r}
+birthlm3 <- lm(births ~ I(dayofyear-183) + I((dayofyear-183)^2) + I((dayofyear-183)^3) + I((dayofyear-183)^4) + I((dayofyear-183)^5) + sday, data=BirthNew)
+summary(birthlm3)
+```
+
+
+```{r}
+
+b<-birthlm3$coefficients
+
+ggplot(data = BirthNew, aes(x = as.numeric(I(dayofyear-183)), y = births)) + 
+  geom_point()  + 
+  aes(colour = wday) + 
+  labs(title = "Centered Variabel") +
+  stat_function(fun=function(x) (b[1]+b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5), col="black", lwd=1) +
+  stat_function(fun=function(x) (b[1]+ b[7]+ b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5), col="maroon1", lwd=1) +
+  stat_function(fun=function(x) (b[1]+b[8]+b[2]*x + b[3]*x^2 + b[4]*x^3 + b[5]*x^4 + b[6]*x^5), col="lightcoral", lwd=1)
+```
+
+
+The current model is 
+
+$$
+Y_i = \beta_0 + \beta_1x_{i1} + \beta_{11}x_{i1}^2 + \beta_{111}x_{i1}^3 + \beta_{1111}x_{i1}^4 + \beta_{11111}x_{i1}^5 + \beta_2 X_{i2}+ \beta3 X_{i3} + \epsilon_i,  \\ 
+\text{where} \ x_{i1} = X_{i1} - \bar{X_1},  \\
+X_{i2}=1 \ \text{if day is Saturday (coded as 1), otherwise} \ X_{i2} =0, \ \text{and}  \\
+X_{i3}=1 \ \text{if day is Sunday (coded as 2), otherwise} \ X_{i3} =0.
+$$
+
+
+
+To test for regression relation.
+```{r}
+qf(1-.05, 7, 357)
+```
+
+$H_0: \beta_1 = \beta_{11} = \beta_{111} = \beta_{1111} = \beta_{11111}= 0$
+
+$H_a: \text{at least one} \ \beta_k \ne 0$
+
+
+If $F* \le 2.035252$, conclude the null. Otherwise conclude the alternative.
+
+Since $F* = 304.5 > 2.035252$ we conclude the alternative in that there is a regression relation. 
+
+We will therefore keep all of the other terms in the model. 
+
+
+Confidence intervals for weekdays for dayofyear being 120 and 130
+```{r}
+predict(birthlm3, data.frame(dayofyear=c(120,230), sday="0"), interval="confidence", level=1-0.05/2)
+```
+
+Confidence intervals for Saturday for dayofyear being 120 and 130
+```{r}
+predict(birthlm3, data.frame(dayofyear=c(120,230), sday="1"), interval="confidence", level=1-0.05/2)
+```
+
+Confidence intervals for Sundays for dayofyear being 120 and 130
+```{r}
+predict(birthlm3, data.frame(dayofyear=c(120,230), sday="2"), interval="confidence", level=1-0.05/2)
+```
+
+Its not required but the sake of curiosity here is how the centered variables reducted correlation. 
+
+Correlation between dayofyear and dayofyear^2.
+```{r}
+cor(BirthNew$dayofyear, (BirthNew$dayofyear)^2)
+```
+
+Correlation between x and x^2.
+```{r}
+cor((BirthNew$dayofyear-mean(BirthNew$dayofyear)), (BirthNew$dayofyear-mean(BirthNew$dayofyear))^2)
+```
+
+Using a centered variables greatly helps to reduce correlation and thereby multicollinearity. 
+
+We should see the same pattern in all cases. 
+
+
+
+
+
+
+
+
+<footer>
+</footer>
+
+
+
+ 
+ <style>
+ #points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#rrecpoints {
+  font-size:1em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#report {
+  font-size:.7em;
+  padding-left:15px;
+  font-weight:normal; 
+  color:#5a5a5a;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+ </style>
+
+ 
+
+ 
+
+ 

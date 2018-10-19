@@ -1,0 +1,27 @@
+---
+title: "Class Activity"
+author: "Jacob"
+date: "March 2, 2018"
+output: html_document
+---
+
+```{r, include=FALSE}
+sdata <- read.table("../Data/Sdata.csv", header=TRUE)
+```
+
+```{r, fig.height=20, fig.width=20}
+pairs(sdata)
+```
+
+```{r}
+plot(Y ~ X13, data=sdata)
+lm1 <- lm(Y ~ X13 + I(X13)^2,data=sdata)
+b <- lm1$coefficients 
+curve(b[1] + b[2]*x + b[3]*(x)^2, add=TRUE, col="black")
+```
+
+```{r}
+
+pairs(cbind(sdata, R=lm1$residuals))
+```
+

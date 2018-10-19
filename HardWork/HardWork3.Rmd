@@ -1,0 +1,549 @@
+---
+title: "Hard Work 3"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+library(mosaic)
+library(lmtest)
+library(alr3)
+```
+
+## Instructions
+
+1. Study Sections 3.1-3.8 of Chapter 3: "Diagnostics and Remedial Measures."    
+<span id=note>(We will study more of Chapter 3 next week.)</span>
+
+
+2. Attempt and submit at least <span id=points style="padding-left:0px;">{52}</span> Hard Work Points by Saturday at 11:59 PM.    
+<span id=note>Over <span id=points style="padding-left:0px;">{56}</span> gets you {+1} Final Exam Point.</span>    
+<span id=note>Over <span id=points style="padding-left:0px;">{62}</span> gets you {+2} Final Exam Points.</span>    
+<span id=note>Over <span id=points style="padding-left:0px;">{70}</span> gets you {+3} Final Exam Points.</span>
+
+## Reading Points <span id=headpoints>{30} Possible</span>
+
+<div style="padding-left:20px;">
+
+### Section 3.1 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span>
+
+### Section 3.2 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span>
+
+### Section 3.3 <span id=recpoints>{8}</span><span id=report>{ 8 / 8 }</span>
+
+### Section 3.4 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span>
+
+### Section 3.5 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span>
+
+### Section 3.6 <span id=recpoints>{6}</span><span id=report>{ 6 / 6 }</span>
+
+### Section 3.7 <span id=recpoints>{7}</span><span id=report>{ 6 / 7 }</span>
+
+### Section 3.8 <span id=recpoints>{1}</span><span id=report>{ 1 / 1 }</span>
+
+</div>
+
+## Theory Points <span id=headpoints>{9} Possible</span>
+
+<div style="padding-left:20px;">
+
+### 3.1 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span>
+
+**Distinguish between (1) residual and semistudentized residual, (2) $E[ \epsilon_i ]=0$ and $\bar{e} = 0$, (3) error term and residual.**
+
+1. A residual is defined by $e_i = Y_i - \hat{Y_i}$. A semistudentized residual is defined by $e_i / \sqrt{MSE}$. Its the residual but scaled back by the estimated standard devaiton of the error terms. 
+
+2. $E[ \epsilon_i ]=0$ is true because $\epsilon_i \sim N(0, \sigma)$, while $\bar{e} = 0$, is true because the sum of each $\sum e_i =0$. 
+
+3. The error term is apart of the linear regression model and has an independent normal distribution with mean 0 and variance $\sigma^2$. The residuals are defined $e_i = Y_i - \hat{Y_i}$, which are never independent and but can be approximately normal.  
+
+ 
+### 3.12 <span id=points>{2}</span><span id=report>{ 1 / 2 }</span>
+
+SSPE is different than an ordinary sum of squares because it is summing up the deviations from the mean in each group, or $X_i$. It is also an unbaised estimator of the variance of the error term. 
+
+### 3.21 <span id=points>{3}</span><span id=report>{ / }</span>
+
+
+
+### 3.23 <span id=points>{2}</span><span id=report>{ 1 / 2 }</span>
+
+The full model:
+
+$Y_{ij} = \mu_j + \epsilon_{ij}$
+
+$df_F=n-c$, where $c$ is the number of groups, $j$. 
+
+The reduced model:
+
+$Y_{ij} = \beta_1 X_j + \epsilon_{ij}$
+
+$df_R= n-1$, where $\beta_0=0$, meaning we have 1 more degree of freedom. 
+
+$H_0: E \{ Y \}=\beta_1X$
+
+$H_a: E \{ Y \} \ne \beta_1X$
+
+
+
+</div>
+
+
+## Application Points <span id=headpoints>{32} Possible</span>
+
+<div style="padding-left:20px;">
+
+<a id=datalink style="font-size:.9em;" target="_blank" href=http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/index.html>Data Files</a>
+
+### 3.3 <span id=recpoints>{6}</span><span id=report>{ 6 / 6 }</span>
+
+```{r p33}
+# Load the Data:
+p1.19 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%203%20Data%20Sets/CH03PR03.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.19) <- c("Y","X","X2","X3")
+
+p1.19.lm <- lm(Y ~ X, data=p1.19)
+```
+
+**a.**
+
+```{r}
+boxplot(p1.19$X, main="X_i")
+
+boxplot(p1.19.lm$residuals, main="Residuals")
+```
+
+There does not appear to be any apparant outliers in the $X_i$ but a couple in e_i
+
+**b.**
+
+```{r}
+stripchart(p1.19.lm$residuals, method="stack", main="e_i")
+
+stripchart(p1.19$X, method="stack", main="X_i")
+```
+
+The mean appears to be around zero and that there may be a couple outliers but that's about it. 
+
+**c.**
+
+```{r}
+plot(p1.19.lm, which = 1, main="Residuals on fitted values")
+```
+
+Looking on page 103, we see that these graph can help us with testing parts1, 2 or 4 of the model.
+
+There is a bit of a trend in the residuals, but it shouldn't cause to much of a concern. The current model would be appropriate for the data.   
+
+There a couple outliers that cause some trouble. 
+
+The data appears to have Constant variance but it could be argued. 
+
+**d.**
+
+```{r}
+p1.19.qq <- qqnorm(p1.19.lm$residuals)
+qqline(p1.19.lm$residuals)
+```
+
+The coefficient of correlation between the ordered residuals and their expected values under normality:
+```{r}
+cor(p1.19.qq$x, p1.19.qq$y)
+```
+
+Using the table B.6 with alpha of .05 for n=120 we will use the average of .989
+
+0.9744497 < .989 therefore by the correlation test for normality we can conclude that the error terms are not normally distributed.   
+
+
+**e.**
+
+```{r}
+# Divide the data into two pieces according to the X (ACT) values:
+Group1 <- p1.19$X < 26
+Group2 <- p1.19$X >= 26
+
+# Find the median of the residuals for each group:
+med1 <- median(p1.19.lm$residuals[Group1])
+med2 <- median(p1.19.lm$residuals[Group2])
+
+# Find the absolute value of the deviations around each median for each group:
+d1 <- abs(p1.19.lm$residuals[Group1] - med1)
+d2 <- abs(p1.19.lm$residuals[Group2] - med2)
+
+# Calculate the Brown-Forsythe t test statistic:
+s2BF <- ( sum( (d1-mean(d1))^2 ) + sum( (d2-mean(d2))^2 ) )/(120-2) 
+sBF <- sqrt(s2BF)
+tBF <- (mean(d1)-mean(d2))/(sBF*sqrt(1/sum(Group1)+1/sum(Group2)))
+
+tBF
+```
+
+```{r}
+# Compute the critical value
+qt(1-0.01/2, 120-2)
+```
+
+If $t^*_{BF} \le 2.618137$ the we conclude the null, in that the error variance is constant. Otherwise we conclude that the error variance is not constant.  
+
+$|-0.8967448| < 2.618137$ therefore we can conlude the null. 
+
+This does support the visual interpretation of variance in part (c). 
+
+**f.**
+
+```{r}
+plot(p1.19.lm$residuals ~ X2, data=p1.19, main="Residuals on X2")
+```
+
+This graphs shows that X2 should be added to the model because of the trend it is showing, meaning that it could help to explain $Y_i$. 
+
+```{r}
+plot(p1.19.lm$residuals ~ X3, data=p1.19, main="Residuals on X3")
+```
+
+This graphs shows that X2 should not be added to the model because of there is no trend showing, meaning that it won't help explain $Y_i$. 
+
+### 3.4 <span id=recpoints>{6}</span><span id=report>{ 6 / 6 }</span>
+
+```{r p34}
+# Load the Data:
+p1.20 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%203%20Data%20Sets/CH03PR04.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.20) <- c("Y","X", "X2", "X3")
+
+p1.20.lm <- lm(Y ~ X, data=p1.20)
+```
+
+Refer to Copier maintenance Problem 1.20
+
+**Pepare a dot plot for the number of copiers serviced $X_i$. What information is provided by the plot? Are there any outlyings cases with respect to this variable?** 
+
+```{r}
+stripchart(p1.20$X, method="stack")
+```
+
+This tells us the frequencies of the number of X values. This also tells us that there isn't any outliers. 
+
+**b. The cases are given in time order. Prepare a time plot for the number of copiers serviced. What does your plot show?**
+
+```{r}
+plot(p1.20$X, type='b', pch=16, cex=0.8, main="Sequence plot of Y on X")
+```
+
+This tells us that time does not seem to have an influence in the data. This is because the there is not direct pattern. 
+
+**c.**
+
+```{r}
+stem(p1.20.lm$residuals)
+```
+
+The stem and leaf plot shows us a quick way of seeing that the distribution of the residuals. They appear to be normal and the mean is around 0. 
+
+**d.**
+
+```{r}
+plot(p1.20.lm, which = 1, main="Residuals on fitted values")
+plot(p1.20.lm$residuals ~ X, data=p1.20, main="Residuals on X")
+```
+
+In our case they provide the exact some information but only on a different scale. We only need to look at the two separately if the line is curve-linear or the model is for multiple linear regression. 
+
+Looking on page 103, we see that these graph can help us with testing parts 1, 2 or 4 of the model.
+
+**e.**
+
+```{r}
+p1.20.qq <- qqnorm(p1.20.lm$residuals)
+qqline(p1.20.lm$residuals)
+```
+
+```{r}
+cor(p1.20.qq$x, p1.20.qq$y)
+```
+
+Using the table with alpha of .1 for n=45 we will use the average of .977 and .981 which is .979
+
+0.9889098 > .979 therefore by the correlation test for normality we can conclude that the error terms are normally distributed.   
+
+**f.**
+
+```{r}
+plot(p1.20.lm$residuals, type='b', pch=16, cex=0.8, main="Time plot or sequence plot of residuals")
+```
+
+The residuals do not appear to have any correlation with time.
+
+**g.**
+
+```{r}
+qchisq(.95,1)
+```
+
+If $X^2_{BP} \le 3.8414$ then we conclude the null in that the variance is constant. Otherwise the the variance is not constant. 
+
+
+```{r}
+bptest(p1.20.lm, studentize=FALSE)
+```
+
+
+1.3147 < 3.8414, therefore we conclude the null and that the variance is constant. 
+
+**h.**
+
+
+```{r}
+plot(p1.20.lm$residuals ~ X2, data=p1.20, main="Residuals on X2, operational age of copiers (in months")
+```
+
+It appears that adding X2 could be a benefit to the model. The residuals have some order and pattern to them that could be explained by X2.
+
+```{r}
+plot(p1.20.lm$residuals ~ X3, data=p1.20, main="Residuals on X3, years of experience")
+```
+
+X3 does not appear to add much to the model. It does not add any explanation to the residuals. 
+
+### 3.5 <span id=recpoints>{5}</span><span id=report>{ 5 / 5 }</span>
+
+```{r p35}
+# Load the Data:
+p1.21 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR21.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.21) <- c("Y","X")
+
+p1.21.lm <- lm(Y ~ X, data=p1.21)
+```
+
+
+**a.**
+
+```{r}
+stripchart(p1.21$X, method="stack")
+```
+
+The distribution appears to be right-skewed.
+
+**b.**
+
+```{r}
+plot(p1.21$X, type='b', pch=16, cex=0.8, main="Sequence plot of Y on X")
+```
+
+There does not appear to be any correlation with time and $X_i$. 
+
+**c.**
+
+```{r}
+stem(p1.21.lm$residuals)
+```
+
+
+From this plot it is hard to tell where the mean is but the distribution does not look approximately normal but it is difficult to tell with a low sample size
+
+**d.**
+
+```{r}
+plot(p1.21.lm$residuals ~ X, data=p1.21, main="Residuals on X")
+plot(p1.21.lm, which=1)
+```
+
+Variance does not appear to be constant, but the error terms do not appear to show much of a pattern so the model should be appropriate for the data but we may have a couple outliers such as 1,4, and 7. But this could be because the variance is not constant. 
+
+**e.**
+
+```{r}
+p1.21.qq <- qqnorm(p1.21.lm$residuals)
+qqline(p1.21.lm$residuals)
+```
+
+```{r}
+cor(p1.21.qq$x, p1.21.qq$y)
+```
+
+Using the table B.6 with alpha of .01 for n=10 we will require .879. 
+
+0.9609751 > .879 therefore by the correlation test for normality we can conclude that the error terms are normally distributed.   
+
+**f.**
+
+```{r}
+plot(p1.21.lm$residuals, type='b', pch=16, cex=0.8, main="Time plot or sequence plot of residuals")
+```
+
+The residuals do not appear to have any correlation with time. Therefore the error terms are independent. 
+
+**g.**
+
+```{r}
+qchisq(.90,1)
+```
+
+If $X^2_{BP} \le 2.705543$ then we conclude the null in that the variance is constant. Otherwise the the variance is not constant. 
+
+
+```{r}
+bptest(p1.21.lm, studentize=FALSE)
+```
+
+
+1.0331 < 2.705543, therefore we conclude the null and that the variance is constant.
+
+This goes against what I previously believed in part (d). Perhaps with a greater sample size the graph would appear to show a more consistent variance throughout. 
+
+
+### 3.6 <span id=points>{5}</span><span id=report>{ / }</span>
+
+```{r p36}
+# Load the Data:
+p1.22 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR22.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.22) <- c("Y","X")
+```
+
+
+### 3.7 <span id=points>{4}</span><span id=report>{ / }</span>
+
+```{r p37}
+# Load the Data:
+p1.27 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR27.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.27) <- c("Y","X")
+```
+
+
+### 3.8 <span id=points>{3}</span><span id=report>{ / }</span>
+
+```{r p38}
+# Load the Data:
+p1.28 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR28.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.28) <- c("Y","X")
+```
+
+
+### 3.13 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+```{r p313}
+# Load the Data:
+p1.20 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR20.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.20) <- c("Y","X")
+
+p1.20.lm <-lm(Y ~ X, data=p1.20)
+```
+
+
+**a.**
+
+$H_0: E \text{{Y}} = \beta_0 + \beta_1X$
+
+$H_a: E \text{{Y}} \ne \beta_0 + \beta_1X$
+
+
+**b.**
+
+```{r}
+table(p1.20$X)
+qf(1-.05, 8, 35)
+```
+
+If $F^* \le 2.216675$ then we conclude the null, otherwise we conclude the alternative.
+
+```{r}
+
+pureErrorAnova(p1.20.lm)
+
+```
+
+.9676 < 2.216, therefore the data is a good fit for the linear regression model. 
+
+**c.**
+
+The test does not detect other departures of the model but there are assumptions that need to be met for the test to be be useful in interpretation. The assumptions are that X and Y are independent and normally distributed and that the distributions of Y have the same variance. 
+
+If these assumptions are not met then the test would break down and the results may be skewed or inaccurate. 
+
+</div>
+
+
+
+
+
+
+
+
+
+
+ <style>
+#points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#report {
+  font-size:.7em;
+  padding-left:15px;
+  font-weight:normal; 
+  color:#5a5a5a;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+</style>
+
+
+<footer>
+</footer>
+
+
+
+ 
+
+ 
+
+ 
+
+ 

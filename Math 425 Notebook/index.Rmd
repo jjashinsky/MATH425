@@ -1,0 +1,290 @@
+---
+title: "The Math 425 Notebook"
+output: 
+  html_document:
+    theme: flatly
+---
+
+
+
+```{r setup, echo=FALSE}
+library(tree)
+pointSize = .8
+pointSizeAccent = .4
+
+pointColor = "gray41"
+pointColor2 = "gray68"
+pointColorAccent = "gray60"
+
+lineColor = "gray58"
+lineColor2 = "gray68"
+```
+
+
+
+## Unit 1
+
+<a href=SimpleLinearRegression.html><div class="plotbox">
+
+<center>
+**Simple Linear**
+</center>
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+par(mai=c(0,0,0,0))
+set.seed(66)
+x <- runif(50,0,20)
+y <- 2+.8*x+rnorm(50,0,1.2)
+
+plot(y ~ x, pch=16, cex=pointSize, xaxt='n', yaxt='n', xlab="", ylab="", col=pointColor, bty='n')
+tlm <- lm(y ~ x)
+abline(tlm, col=lineColor, lwd=2)
+points(y ~ x, pch=16, cex=pointSizeAccent, col=pointColorAccent)
+
+```
+
+</div></a>
+
+
+
+
+<a href=SimpleLinearRegressionRemediation.html><div class="plotbox">
+
+<center>
+**Remediation**
+</center>
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+par(mai=c(0,0,0,0))
+set.seed(656)
+x <- sort(runif(50,0,20))
+y <- 3 + 2.5*x + rnorm(50,0,seq(1,25, length.out=50))
+
+plot(y ~ x, pch=16, cex=pointSize, xaxt='n', yaxt='n', xlab="", ylab="", col=pointColor, bty='n')
+tlm <- lm(y ~ x)
+abline(tlm, col=lineColor, lwd=2)
+points(y ~ x, pch=16, cex=pointSizeAccent, col=pointColorAccent)
+```
+
+</div></a>
+
+<a href=PolynomialRegression.html><div class="plotbox">
+
+<center>
+**Transformations**
+</center>
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+par(mai=c(0,0,0,0))
+set.seed(67)
+x <- runif(50,10,20)
+y <- log(1 + 250*x + rnorm(50,0,450))
+
+plot(y ~ x, pch=16, cex=pointSize, xaxt='n', yaxt='n', xlab="", ylab="", col=pointColor, bty='n')
+tlm <- lm(y ~ x + I(x^2) + I(x^3))
+b <- coef(tlm)
+curve(b[1]+b[2]*x+b[3]*x^2+b[4]*x^3, col=lineColor, lwd=2, add=TRUE)
+points(y ~ x, pch=16, cex=pointSizeAccent, col=pointColorAccent)
+```
+
+</div></a>
+
+
+
+
+
+
+
+<div style="clear:both;"></div>
+
+<br/><br/>
+
+
+## Unit 2
+
+<div class="plotbox">
+
+<center>
+**Multiple Linear**
+</center>
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+par(mai=c(0,0,0,0))
+set.seed(667)
+x <- runif(50,0,20)
+x2 <- runif(50,0,20)
+y <- 3+.8*x+rnorm(50,0,3.2)
+y2 <- 4+2.3*x2+rnorm(50,0,3.2)
+
+plot(y ~ x, pch=16, cex=pointSize, xaxt='n', yaxt='n', xlab="", ylab="", col=pointColor, bty='n', ylim=c(-10,55), xlim=c(0,20))
+points(y2 ~ x2, pch=16, cex=pointSize,col=pointColor2)
+mydat <- data.frame(y=c(y,y2), x=c(x,x2), g=rep(c(0,1),each=50))
+tlm <- lm(y ~ x * g, data=mydat)
+b <- coef(tlm)
+abline(b[1],b[2], col=lineColor, lwd=2)
+abline(b[1]+b[3],b[2]+b[4], col=lineColor2, lwd=2)
+points(y ~ x, pch=16, cex=pointSizeAccent, col=pointColorAccent)
+```
+
+</div>
+
+<div class="plotbox">
+
+<center>
+**High Dimensional**
+</center>
+
+```{r, include=FALSE}
+library(plotly)
+```
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+par(mai=c(0,0,0,0))
+set.seed(66)
+x <- runif(50,0,20)
+y <- 2+.8*x+rnorm(50,0,1.2)
+
+p <- plot_ly(x = ~x, y = ~x, z = ~y, color = rep(c("one","two"),25), colors = c('#BF382A', '#0C4B8E')) %>%
+  add_markers() %>%
+  layout(scene = list(xaxis = list(title = 'Weight'),
+                     yaxis = list(title = 'Gross horsepower'),
+                     zaxis = list(title = '1/4 mile time')))
+
+```
+
+</div>
+
+
+<div class="plotbox">
+
+<center>
+**Model Selection**
+</center>
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+thedata <- airquality[,-c(3,6)]
+colnames(thedata) <- c("Y","X1","X2","X3")
+pairs(thedata, pch=16, cex=pointSize, xaxt='n', yaxt='n', col=pointColor, bty='n', oma=c(0,0,0,0), gap=.25, cex.labels = .8)
+```
+
+</div>
+
+
+<div style="clear:both;"></div>
+
+
+<br/><br/>
+
+
+
+
+
+## Unit 3
+
+<div class="plotbox">
+
+<center>
+**Poisson**
+</center>
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+par(mai=c(0,0,0,0))
+set.seed(667)
+x <- runif(50,0,20)
+x2 <- runif(50,0,20)
+y <- 3+.8*x+rnorm(50,0,3.2)
+y2 <- 4+2.3*x2+rnorm(50,0,3.2)
+
+plot(y ~ x, pch=16, cex=pointSize, xaxt='n', yaxt='n', xlab="", ylab="", col=pointColor, bty='n', ylim=c(-10,55), xlim=c(0,20))
+points(y2 ~ x2, pch=16, cex=pointSize,col=pointColor2)
+mydat <- data.frame(y=c(y,y2), x=c(x,x2), g=rep(c(0,1),each=50))
+tlm <- lm(y ~ x * g, data=mydat)
+b <- coef(tlm)
+abline(b[1],b[2], col=lineColor, lwd=2)
+abline(b[1]+b[3],b[2]+b[4], col=lineColor2, lwd=2)
+points(y ~ x, pch=16, cex=pointSizeAccent, col=pointColorAccent)
+```
+
+</div>
+
+<div class="plotbox">
+
+<center>
+**Trees**
+</center>
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+par(mai=c(0,0,0,0))
+tree.model <- tree(Species ~ Sepal.Width + Petal.Width, data=iris)
+palette(c(pointColor2,pointColorAccent,pointColor))
+plot(Sepal.Width ~ Petal.Width, data=iris, pch=19, col=Species, cex=pointSize)
+partition.tree(tree.model, add=TRUE, col=rgb(1,1,1,0))
+
+```
+
+</div>
+
+
+<div class="plotbox">
+
+<center>
+**Logistic**
+</center>
+
+```{r, echo=FALSE, fig.width=1.5, fig.height=1.5}
+par(mai=c(0,0,0,0))
+set.seed(151)
+x <- runif(30)
+thedata <- data.frame(x=x,y=ifelse(x+rnorm(30,0,.1) > .5, 1, 0))
+plot(y ~ x, data=thedata, pch=16, cex=pointSize, xaxt='n', yaxt='n', col=pointColor, bty='n',  ylim=c(-0.25,1.25))
+myglm <- glm(y ~ x, data=thedata, family=binomial)
+b <- coef(myglm)
+curve(exp(b[1]+b[2]*x)/(1+exp(b[1]+b[2]*x)), add=TRUE, col=lineColor)
+points(y ~ x, data=thedata, cex=pointSizeAccent, col=pointColorAccent, lwd=2)
+```
+
+</div>
+
+
+
+
+
+
+
+
+
+
+<style>
+a {
+    color: #5a5a5a;
+}
+
+.plotbox {
+    float: left;
+    width: 175px;
+    border: 1px solid #cccccc;
+    background-color: #f8f8f8;
+    border-radius: 3px;
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    font-family: Monospace, sans-serif;
+    margin-top: .5em;
+}
+
+.plotbox:hover {
+    width: 175px;
+    border: 1px solid #dddddd;
+    background-color: #c1c1c1;
+    border-radius: 3px;
+    padding-left: 15px;
+    padding-top: 5px;
+    padding-bottom: 10px;
+    padding-right: 10px;
+    font-family: Monospace, sans-serif;
+    color: #1a1a1a;
+    margin-top: .5em;
+}
+
+</style>

@@ -1,0 +1,900 @@
+---
+title: "Hard Work 2"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+library(mosaic)
+```
+
+## Instructions
+
+1. Study Sections 2.1-2.10 of Chapter 2: "Inferences in Regression and Correlation Analysis."    
+<span id="note">(Pace yourself, you have two weeks to work on this assignment.)</span>
+
+2. Attempt and submit at least <span id=points style="padding-left:0px;">{83}</span> Hard Work Points by Saturday at 11:59 PM.    
+<span id=note>Over <span id=points style="padding-left:0px;">{92}</span> gets you {+1} Final Exam Point.</span>    
+<span id=note>Over <span id=points style="padding-left:0px;">{100}</span> gets you {+2} Final Exam Points.</span>    
+<span id=note>Over <span id=points style="padding-left:0px;">{107}</span> gets you {+3} Final Exam Points.</span>
+
+<br/>
+
+
+
+## Reading Points <span id=headpoints>{40} Possible</span>
+
+### Section 2.1 <span id=recpoints>{6}</span><span id=report>{ 6 / 6 }</span>
+
+### Section 2.2 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+### Section 2.3 <span id=recpoints>{1}</span><span id=report>{ 0 / 1 }</span>
+
+### Section 2.4 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span>
+
+### Section 2.5 <span id=recpoints>{6}</span><span id=report>{ 6 / 6 }</span>
+
+### Section 2.6 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+### Section 2.7 <span id=recpoints>{8}</span><span id=report>{ 8 / 8 }</span>
+
+### Section 2.8 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span>
+
+### Section 2.9 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+### Section 2.10 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span>
+
+
+<br/>
+
+
+
+
+## Theory Points <span id=headpoints>{33} Possible</span>
+
+### Problem 2.1 <span id=points>{1}</span><span id=report>{ 1 / 1 }</span>
+
+a. The student concluded from these results that there is a linear association between $Y$ and $X$. Is the conclusion warranted? What is the iplied level of significance?   
+
+Considering zero is not included within the confidence interval for $b_1$ it is safe say that there is a linear relationship between X and Y. The level of signifcance in this case is 0.05. 
+
+b. Someone questioned the negative lower confidence limit for the intercept, pointing out that dollar sales cannot be negative even if the population in a district is zero. Discuss. 
+
+A further look into the data may reavel that the intecept is out of the scope of the model anyways, and it is not needed to bother fussing with a negative intercept.  
+
+### Problem 2.2 <span id=points>{1}</span><span id=report>{ 1 / 1 }</span>
+
+In a test of the alternatives $H_0: \beta_1 \le 0$ verus $H_a: \beta_1 > 0$, an analyst concluded the null. Does this conclusion imply that there is no linear association between X and Y? Explain.
+
+Concluding with the null, in that $\beta_1 \le 0$, does not imply that there is no linear association, but rather, there is a negtive linear association. $\beta_1$ is allowed to be negative. 
+ 
+### Problem 2.3 <span id=points>{1}</span><span id=report>{ 1 / 1 }</span>
+
+A student received the following outputs, where X is advertising expenditures and Y is sales. 
+
+$\hat{Y} = 350.7 - .18X$
+
+A two sided p-value, $P = .91$
+
+The student stated: "The message I get here is that the more we spend on advertising this product the fewer units we sell!" Comment. 
+
+Considering the p-value is .91, this tells us that the individual would conclude with the null. Assuming that the null is $\beta_1=0$, this would tell the student that the slope is actually believed to be zero, meaning there is no linear relationship between advertising and sales. Advertising expenditures are not useful to describe sales.  
+
+If the null was say, $\beta_1 \le 0$, then the student's statement would be some what correct. A negative linear relationship is apparent but there may be other reasons for the decline in sales.  
+
+### Problem 2.9 <span id=points>{1}</span><span id=report>{ 1 / 1 }</span>
+
+Refer to figure 2.2. A student, noting that $s[b_1]$ is furnished in the printout, asks why $s[\hat{Y_h}]$ not also given. Discuss. 
+ 
+$s[\hat{Y_h} ]$ is not generally given in a set output because it must calculated from a specific $X_h$ value. It would not be practical to include those values and the corresponding $s[\hat{Y_h} ]$.
+
+### Problem 2.11 <span id=points>{1}</span><span id=report>{ 1 / 1 }</span>
+
+A person asks if there is difference between the "mean response at $X=X_h$" and the "mean of $m$ new observations at  $X=X_h$." Reply.
+
+There is a slight difference between how they are calculated and so they are inherently different in values. The standard deviation of the mean of $m$ observation is dervied from the variance used in the mean response. 
+
+The mean response uses the square root of 
+$$
+s^2\text{{pred}} = MSE+ [1 + 1/n + (X_h - \bar{X})^2/\sum (X_i -\bar{X})^2 ]
+$$
+
+But the mean of $m$ observations is the square root of 
+$$
+s^2\text{{predmean}} = MSE/m + [1 + 1/n + (X_h - \bar{X})^2/\sum (X_i -\bar{X})^2 ]
+$$
+ 
+### Problem 2.12 <span id=points>{1}</span><span id=report>{ / }</span>
+
+### Problem 2.18 <span id=points>{1}</span><span id=report>{ 1 / 1 }</span>
+<span id=headnote>Hint: Read page 71</span>
+
+The t test can be either one-tailed or two-tailed to accommodate a one-sided or two-sided hypothesis test. An F test cannot handle a one sided hypothesis test.  
+ 
+### Problem 2.19 <span id=points>{1}</span><span id=report>{ 1 / 1 }</span>
+
+The reason why the F test is a one tailed test computing a two-sided hypothesis is because the proportion that $F*$ is. $F*=MSR/MSE$. 
+
+MSR is bigger when $\beta_1$ is greater than zero, leading a larger F score. But whether $\beta_1$ is positive or negative, does not matter because the values of MSR and MSE as shown below are always positive, leading to a positve F score. This allows for a two sided test.  
+$$
+MSR= \sum (\hat{Y_i} - \bar{Y})^2  \\
+MSE = \sum \frac{(Y_i - \bar{Y})^2}{n-2}
+$$
+
+
+### Problem 2.20 or 2.21 or 2.22 <span id=points>{1}</span><span id=report>{ / }</span>
+
+### Problem 2.33 <span id=recpoints>{3}</span><span id=report>{ 1 / 3 }</span>
+
+In developing empirically a cost function from observed data on a complex chemical experiment, an analyst employed normal error regression model (2.1). $/beta_0 was interpreted here as the cost of setting up the experiement. The analyst hypothesized that this cost should be $7.5 thousand and wished to test the hypothesis by mean of a general linear test. 
+
+a. Indicate the alternative conclusions for the test.
+
+$$
+H_0: \beta_0 = 7.5 \ \text{thousands in dollars}   \\
+H_a: \beta_0 \neq 7.5 \ \text{thousands in dollars}
+$$
+
+b. Specify the full and reduced models.
+The full model:
+$Y_i = \beta_0 + \beta_1 X_i + \epsilon_i$, where $\epsilon_i \sim N(0,\sigma^2)$ and $\beta_0 = \text{The cost of setting up the experiment}$. 
+
+The reduced model:
+$Y_i = \beta_0 + \epsilon_i$ where $\epsilon_i \sim N(0,\sigma^2)$ and $\beta_0 = \text{The cost of setting up the experiment}$.
+
+c. Without Additional information, can you tell what quantity $df_R - df_F$ in test statistic will equal in the analyst's test? Explain.
+
+$$
+df_R - df_F = (n-1) - (n-2) = n - 1 - n + 2 = 1 
+$$
+
+
+
+
+
+### Problem 2.50 <span id=points>{2}</span><span id=report>{ / }</span>
+
+### Problem 2.51 <span id=points>{2}</span><span id=report>{ / }</span>
+
+### Problem 2.53 <span id=points>{4}</span><span id=report>{ / }</span>
+
+### Problem 2.66 <span id=recpoints>{5}</span><span id=report>{ 5 / 5 }</span> 
+
+Five observations on $Y$ are taken when $X$ = 4, 8, 12, 16, and 20, respectively. The true regression function is $E{y}=20+4X$, and the $\epsilon_i$ are independent $N(0,25)$.  
+
+a. Generate five normal random numbers, with mean 0 and variance 25. Consider these random numbers as the error terms for the five $Y$ observations at $X$ = 4, 8, 12, 16, and 20 and calculate $Y_1, Y_2, Y_3, Y_4, Y_5$. Obtain the least squares estimates $b_0$ and $b_1$ when fitting a straight line to the five cases. Also calculate $\hat{Y_h}$ when $X_h=10$ and obtain a 95% confidence interval for $E{Y_h}$ when $X_h=10$.
+
+```{r}
+set.seed(122)
+
+error <- rnorm(5, 0, sqrt(25))
+X <- c(4, 8, 12, 16, 20)
+Y <- 20 + 4*X + error
+mylm1 <- lm(Y ~ X)
+summary(mylm1)
+mean(Y)
+```
+
+$\hat{Y_h} = 16.934 + 4.408 * 10 = 61.014$
+
+```{r}
+predict(mylm1, data.frame(X=10), interval="confidence")   # confidence interval for Y_h
+confint(mylm1)   # confidence interval for points estimates. 
+```
+
+
+Confidence interval for $E[Y_h]$ when $X_h = 10$. is $(43.307, 78.721)$.
+
+b. Repeat part (a) 200 times, generating new random numbers each time. 
+
+```{R}
+set.seed(121)
+
+
+X <- c(4, 8, 12, 16, 20)
+N <- 200
+
+
+intecept <- rep(NA, N)
+slope <- rep(NA,N)
+lower <- rep(NA, N)
+upper <- rep(NA, N)
+for (i in 1:N){
+  error <- rnorm(5, 0, sqrt(25))
+  Y <- 20 + 4*X + error
+  mylm <- lm(Y ~ X)
+  intecept[i] <- mylm$coefficients[1]
+  slope[i] <- mylm$coefficients[2]
+  lower[i] <- predict(mylm, data.frame(X=10), interval="confidence")[2]
+  upper[i] <- predict(mylm, data.frame(X=10), interval="confidence")[3]
+}
+
+```
+
+c. Make a frequency distribution of the 200 estimates $b_1$. Calculate the mean and standard deviation of the 200 estimates $b_1$. Are the results consistent with the theoretical expectations?
+
+```{r}
+hist(slope, col="blue", main="Density Plot of b_1")
+mean(slope)
+sd(slope)
+```
+
+```{r}
+
+SSE <- sum( mylm1$res^2 )
+
+n <- length(mylm1$res)
+
+MSE <- SSE/(n - 2)
+
+s2b1 <- ( MSE / sum( ( X - mean(X) )^2) )
+
+sqrt(s2b1)
+```
+
+It is consistent. The standard deviation is as expected. And the shape of the distribution is approximately normal 
+
+d. What proportion of the 200 confidence intervals for $E[Y_h]$ when $X_h = 10$ include  $E[Y_h]$? Is this consistent with theoretical expectations?
+
+```{r}
+N <-200
+C <- 0
+
+for (i in 1:N){
+  if (lower[i] < 60 & upper[i] > 60){
+     C <- C + 1
+  }  
+}
+
+C / 200
+```
+
+From the output we can see that 95% of the confidence intervals contain the true mean. This is exactly what we expected to happen. 
+
+
+### Exercise 2.55 <span id=recpoints>{2}</span><span id=report>{ / }</span>
+
+### Exercise 2.57 <span id=points>{3}</span><span id=report>{ / }</span>
+
+### Exercise 2.61 <span id=points>{3}</span><span id=report>{ / }</span>
+
+ 
+
+<br/>
+
+
+
+## Application Points <span id=headpoints>{53} Possible</span>
+
+<a id=datalink target="_blank" href=http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/index.html>Data Files</a>
+
+
+### Problem 2.4 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span>
+
+```{r p4}
+# Load the Data:
+p1.19 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR19.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.19) <- c("Y","X")
+```
+
+
+Refer to Grade point average Problem 1.19.
+
+a. Obtain a 99 percent confidence interval for \beta_1. Interpret your confidence interval. Does it include zero? Why might the director of admissions be interested in whether the confidence interval includes zero? 
+
+```{r}
+mylm <- lm(Y ~ X, data=p1.19)
+confint(mylm, level=.99)
+```
+
+The confidence interval for $b_1$ is (0.0054, 0.0723). We are 99 percent confident that the true slope, $\beta_1$, is found within this interval. Zero is  not included in this interval. The director would be interested to know because if zero was included this might lead to believe that ACT test scores are not good predictors for end of th eyear GPA. 
+
+b. Test, using the test statistic $t*$, whether or not a linear association exists betwen student's ACT score $(X)$ and GPA at the end of the freshman year $(Y)$. Use a level of significance of 0.01. State the alternatives, decision rule, and conclusion.
+
+The following code will find $t$ for the descision rule.
+
+```{r}
+qt(1-.01/2, 118)
+```
+
+The test statistic for $b_1$ is $t* = 3.040$. 
+
+If $|t*| \le 2.618$, conclude $H_0$, where $\beta_1 = 0$
+
+If $|t*| > 2.618$, conclude $H_a$, where $\beta_1 \ne 0$
+
+Because 3.04 > 2.618 we can conclude the null. There is a linear association between X and Y. 
+
+
+c. What is the P-value of your test in part (b)? How does it support the conclusion reached in part (b)?
+
+The p-value for the test is 0.002917, which confirms our conclusion above. 
+
+
+### Problem 2.5 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span> 
+
+```{r p5}
+# Load the Data:
+p1.20 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR20.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.20) <- c("Y","X")
+```
+
+Refer to Copier maintaince Problem 1.20
+
+a. Estimate the change in the mean service time when the number of copiers serviced increases by one. Use a 90 percent confidence interval. Interpret your confidence interval. 
+
+```{r}
+p1.20.lm <- lm(Y ~ X, data=p1.20)
+summary(p1.20.lm)
+confint(p1.20.lm, level = .90)
+```
+
+The estimated change is $b_1 = 15.0352$
+
+The 90% confidence interval for this change is (14.22314, 15.847352). 
+
+We are 95% confident that the true change in mean service time, is in the interval. 
+
+b. Conduct a $t$ test to determine whether or not there is a linear association between X and Y here; control the $\alpha$ risk at 0.1. State the alternatives, desision rule, and conclusion. What is the P-value of your test? 
+
+$H_0: \beta_1 = 0$
+
+$H_a: \beta_1 \ne 0$
+
+```{r}
+qt(1-.1/2, 43)
+```
+
+if $|t*| \le 1.681$ conclude the null.
+
+if $|t*| > 1.681$ conclude the alternative. 
+
+|t*| = 31.123 > 1.681, therefore we conclude the alternative. 
+
+```{r}
+2 * pt(31.123, 43, lower.tail=FALSE)
+```
+
+P-value = 4.0104e-31
+
+c. Are your results in part (a) and (b) consistent? Explain. 
+
+They are consistent. The confidence interval does not include zero. This leads us to believe that the null is not true, which is what part (b) also leads us to believe. 
+
+d. The manifacturer has suggested the the mean required time should not increase by more than 14 min. for each additonal copier that is serviced on a service call. Conduct a test to decide whether this standard is being satisified by Tri-City. Control  the risk of a type I error at .05. State the alternatives, desision rule, and conclusion. What is the P-value of the test? 
+
+$H_0: \beta_1 \le 14$
+
+$H_a: \beta_1 > 14$
+
+```{r}
+qt(1-.05, 43)
+```
+
+if $t* \le 1.681$ conclude the null.
+
+if $t* > 1.681$ conclude the alternative. 
+
+```{r}
+(15.0352 - 14)/.4831
+```
+
+t* = 2.1428 > 1.681
+
+therefore we conclude with the 
+
+```{r}
+pt(2.1428, 43, lower.tail=FALSE)
+```
+
+p-value = .0189
+
+e. Does $b_0$ give any relevant information here about the start up time on calls - i.e., about the time required before service work is begun on the copiers at a customers location? 
+
+The intercept, $b_0$, suggest that there is a a negative start up time. This is not logical therefore $X=0$ is not within our scope of the model.  
+
+### Problem 2.7 <span id=points>{3}</span><span id=report>{ / }</span> 
+
+```{r p7}
+# Load the Data:
+p1.22 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR22.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.22) <- c("Y","X")
+```
+
+
+### Problem 2.10 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span> 
+
+For each of the following questions, explain whether a confidence interval for a mean response or a prediction interval for a new observation is appropriate.
+
+a. What will the humidity level in this greenhouse tomorrow when we set the tempurature level at 31 C
+
+A prediction interval for a new observation is appropriate, because they are not asking for a mean response but a prediction for a specific X value. 
+
+b. How much do families whose disposable income is $23,500 spend, on the average, for meals away from home?
+
+A confidence interval for a mean response is best because they are asking for a mean as a specific X value. 
+
+c. How many kilowatt-hours of electricity will be consumed next month by commercial and industrial users in the Twin Cities service area, given that the index of business activity for the area remains at its present value? 
+
+A prediction interval for a new observation is appropriate, because they are not asking for a mean response but a prediction for a specific X value. 
+
+### Problem 2.13 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span> 
+
+```{r p13}
+# Load the Data:
+p1.19 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR19.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.19) <- c("Y","X")
+```
+
+Refer to grade point average Problem 1.19
+
+a. Obtain a 95% confidence interval estimate of the mean fresham GPS for students whos ACT test scores is 28. Interpret your confidence interval. 
+
+```{r}
+p1.19.lm <- lm(Y ~ X, data=p1.19)
+predict(p1.19.lm, data.frame(X=28), interval="confidence")
+```
+
+We are 95% confident that the value of $\hat{Y_h}$ when $X_h=28$ is within the interval, (3.0614, 3.341).
+
+b. Mary Jones obtained a score of 28 on the entrance test. Predict her freshman GPA using a 95 percent prediction interval. Interpret your prediction interval. 
+
+```{r}
+predict(p1.19.lm, data.frame(X=28), interval="predict")
+```
+
+We are 95% confident that the value of $Y_h$ when $X_h=28$ is within the interval, (1.9594, 4.4431).
+
+c. Is the prediction interval in part (b) wider than the confidence interval in part (a)? Should it be?
+
+It is wider. This is because the mean confidence interval is likely to have less variabilty than predicting a single Y_h point, thus a wider interval is needed to have the same confidence level.  
+
+d. Determine the boundary values of the 95% confidence band for the regression line when $X_h = 28$. Is your confidence band wider at this point than the confidence interval in part (a)? Should it be? 
+
+```{r}
+#code for boundarys of Confidence band at X_h
+
+SSE <- sum( p1.19.lm$res^2 )
+
+n <- length(p1.19.lm$res)
+
+MSE <- SSE/(n - 2)
+
+xh <- 28 #or whatever xh is for your problem
+
+s2pred <- MSE*(1/n + (xh - mean(p1.19$X))^2 / sum( (p1.19$X - mean(p1.19$X) )^2) )
+
+spred <- sqrt(s2pred)  
+
+W2 <- 2 * qf(1-.05, 2, 118, lower.tail=TRUE)
+
+W <- sqrt(W2)
+
+mofe <- W * spred
+
+Yh <- 2.11405 + 28 * .03883 
+
+Yh - mofe  # lower bound
+
+Yh + mofe # upper bound 
+
+```
+
+The confidence band when $X_h$ = 28 is (3.02624, 3.37634). This interval is wider than the others because this band has to apply to every X value. Also the band is a parabola. So the further the X value is from the mean will imply that there is a wider interval than a prediction or confidence interval. 
+
+```{r}
+# Create a confidence bands function:
+confbands <- function(lmObject, xh=NULL, alpha=0.05){
+  
+  # Use some fancy code to get the data out of the lmObject
+  # while knowing which variable was x and which was y.
+  thecall <- strsplit(as.character(lmObject$call[2]), "~")
+  yname <- gsub(" ", "", thecall[[1]][1])
+  xname <- gsub(" ", "", thecall[[1]][2])
+  theData <- lmObject$model
+  theData <- theData[,c(yname,xname)]
+  colnames(theData) <- c("Y","X")
+
+  # Begin creating confidence bands  
+  n <- nrow(theData)
+  W2 <- 2*qf(1-alpha, 2, n-2)
+  SSE <- sum( lmObject$res^2 )
+  MSE <- SSE/(n-2)
+  s2.Yhat.h <- function(xh){
+    MSE*(1/n + (xh - mean(theData$X))^2/sum( (theData$X - mean(theData$X))^2 ))
+  }
+  b <- coef(lmObject)
+  
+  # Add upper bound to scatterplot
+  curve(b[1]+b[2]*x + W2*sqrt(s2.Yhat.h(x)), add=TRUE)
+
+  # Add lower bound to scatterplot
+  curve((b[1]+b[2]*x) - W2*sqrt(s2.Yhat.h(x)), add=TRUE)
+  
+  if (!is.null(xh)){
+    tmp <- c(b[1]+b[2]*xh - sqrt(W2)*sqrt(s2.Yhat.h(xh)), b[1]+b[2]*xh + sqrt(W2)*sqrt(s2.Yhat.h(xh)))
+    names(tmp) <- c("Lower","Upper")
+    tmp
+  }
+}
+```
+
+
+```{r}
+# Scatterplot and fitted regression line:
+plot(Y ~ X, data=p1.19)
+
+abline(p1.19.lm)
+
+# Add the confidence bands to the plot
+confbands(p1.19.lm)
+
+# Get the confidence bands value for some xh
+confbands(p1.19.lm, xh=28)
+
+```
+
+
+
+### Problem 2.14 <span id=points>{4}</span><span id=report>{ / }</span> 
+
+```{r p14}
+# Load the Data:
+p1.20 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR20.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.20) <- c("Y","X")
+```
+
+
+### Problem 2.15 <span id=points>{4}</span><span id=report>{ / }</span>
+
+```{r p15}
+# Load the Data:
+p1.21 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR21.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.21) <- c("Y","X")
+```
+
+
+### Problem 2.16 <span id=recpoints>{5}</span><span id=report>{ 5 / 5 }</span> 
+
+```{r p16}
+# Load the Data:
+p1.22 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR22.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.22) <- c("Y","X")
+```
+
+```{r}
+p1.22.lm <- lm(Y ~ X, data=p1.22)
+```
+
+a. Obtain a 98 % confidence inteval for the mean hardness of molded items with an elapsed time of 30 hours. Interpret your confidence interval. 
+
+```{r}
+predict(p1.22.lm, data.frame(X=30), interval = "confidence", level=.98)
+```
+
+b. Obtain a 98% prediction interval for the hardness of a newly molded item with an elasped time of 30 hours. 
+
+```{r}
+predict(p1.22.lm, data.frame(X=30), interval = "prediction", level=.98)
+```
+
+c. Otain a 98% prediction interval for the mean hardness of 10 newly molded test items, each with an elasped time of 30 hours. 
+
+
+```{r}
+#confidence interval for m number of observations
+
+SSE <- sum( p1.22.lm$res^2 )
+
+n <- length(p1.22.lm$res)
+
+MSE <- SSE/(n-2)
+
+m <- 10 #or how ever many new observations you have
+
+xh <- 30 #or whatever xh is for your problem
+
+s2predmean <- MSE*(1/m + 1/n + (xh - mean(p1.22$X))^2 / sum( (p1.22$X - mean(p1.22$X) )^2) )
+
+spredmean <- sqrt(s2predmean)
+
+teststat <- qt(1-.02/2, 14)
+
+mofe <- teststat * spredmean # margin of error 
+
+yh <- 168.6 + 30 * 2.03438   # finding y sub h at x sub h 
+
+
+yh - mofe    # lower bound 
+
+yh + mofe   # upper bound
+```
+
+(226.1772, 233.0856)
+
+d. Is the prediction interval in part (c) narrower then the one in part (b)? Should it be? 
+
+This prediction interval is narrowewr then in part (c), this is because it is predicting a mean rather an observation which has more variability. 
+
+e. Determine the boundary values of the 98% confidence band for the regression line when $X_h=30$. Is your confidence band wider at this point than the confidence interval in tpart (a)? Should it be?  
+
+```{r}
+#code for boundarys of Confidence band at X_h
+
+SSE <- sum( p1.22.lm$res^2 )
+
+n <- length(p1.22.lm$res)
+
+MSE <- SSE/(n - 2)
+
+xh <- 30 #or whatever xh is for your problem
+
+s2pred <- MSE*(1/n + (xh - mean(p1.22$X))^2 / sum( (p1.22$X - mean(p1.22$X) )^2) )
+
+spred <- sqrt(s2pred)  
+
+W2 <- 2 * qf(1-.02, 2, 118, lower.tail=TRUE)
+
+W <- sqrt(W2)
+
+mofe <- W * spred
+
+Yh <- 168.6 + 30 * 2.03438 
+
+Yh - mofe  # lower bound
+
+Yh + mofe # upper bound 
+```
+
+(227.2751, 231.9877)
+
+It is slightly wider than the confidence interval. This interval is wider than the others because this band has to apply to every X value. Also the band is a parabola. So the further the X value is from the mean will imply that there is a wider interval than a prediction or confidence interval. 
+
+### Problem 2.25 <span id=recpoints>{5}</span><span id=report>{ 5 / 5 }</span>
+
+```{r p25}
+# Load the Data:
+p1.20 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR20.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.20) <- c("Y","X")
+```
+
+```{r}
+p1.20.aov <- aov(Y ~ X, data=p1.20)
+p1.20.lm <- lm(Y ~ X, data=p1.20)
+```
+
+a. Set up the ANOVA table. Which elements are additive? 
+
+```{r}
+summary(p1.20.aov)
+```
+
+the df and sum of squares are additive. 
+
+b.  Conduct on F test to decide whether or not there is a linear association between the number of times a carton is transferred and the number of broken ampules; control the $\alpha$ risk at .05. State the alternatives, descision rule, and conclusion.
+
+$H_0: \beta_1=0$
+
+$H_a: \beta_1 \ne 0$
+
+```{r}
+qf(1-0.05, 1, 43)
+```
+
+The decision rule is If $F^* \le 4.067047$ then conclude the null, otherwise conclude the alternative.
+
+Our $F^* = 968.7$ therefore we reject the null and conclude the alternative. There is a linear associaiton between X and Y.
+
+c. Obtain the $t^*$ statistic for the test in part (b) and demonstrate numerically its equivalence to the $F^*$ statistic obtained in part (b). 
+
+```{r}
+summary(p1.20.lm)
+```
+
+The p value for $b_1$ is the same as the p value in the ANOVA table. 
+
+d. Calculate $R^2$ and $r$. What proportion of the variation in Y is accounted for by introducing X into the regression model?
+
+$R^2 = .9575$
+$r = .9785$
+
+
+### Problem 2.26 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span>
+
+```{r p26}
+# Load the Data:
+p1.22 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR22.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.22) <- c("Y","X")
+```
+
+Refer to Airfreight breakage Problem 1.21
+
+a. Set up the ANOVA table. 
+
+```{r}
+myaov2 <- aov(Y ~ X, data=p1.22)
+summary(myaov2)
+```
+
+b. Test by means of an F test whether or not there is a linear association between the harness of the plastic and the elapsed time. Use $\alpha=0.01$. State the alternatives, descision rule, and conclusion. 
+
+$H_0: \beta_1=0$
+
+$H_a: \beta_1 \ne 0$
+
+```{r}
+qf(1-0.01, 1, 14)
+```
+
+The decision rule is If $F^* \le 8.861593$ then conclude the null, otherwise conclude the alternative.
+
+Our $F^* = 506.5$ therefore we reject the null and conclude the alternative. There is a linear associaiton between X and Y.  
+
+c. Plot the deviaitons $Y_i - \hat{Y_i}$ against $X_i$ ona  graph. Plot the deviatons $Y_i - \bar{Y}$ against $X_i$ on another graph, using the same scales as for the first graph. From your two graphs, does SSE or SSR appear to be the larger component of SSTO? what does this imply about the magnitude of $R^2$ and $r$?
+
+```{r}
+plot(Y - (168.6 + 2.03438*X) ~ X, data=p1.22, main="Y_i - Y_i hat")
+plot(((168.6 + 2.03438*X)-mean(p1.22$Y)) ~ X, data=p1.22, main="Y_i hat - Y bar")
+```
+
+It looks like the second graph would make SSR be larger than SSE. This would make $R^2$ and $r$ closer to 1 rather than 0 or .5. 
+
+d. Calculate $R^2$ and $r$.
+
+$R^2 = .9731$ 
+
+$r = .9864583$
+
+
+
+### Problem 2.29 <span id=recpoints>{5}</span><span id=report>{ 5 / 5 }</span> 
+
+```{r p29}
+# Load the Data:
+p1.27 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR27.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.27) <- c("Y","X")
+```
+
+a. Plot the deviaitons $Y_i - \hat{Y_i}$ against $X_i$ ona  graph. Plot the deviatons $Y_i - \bar{Y}$ against $X_i$ on another graph, using the same scales as for the first graph. From your two graphs, does SSE or SSR appear to be the larger component of SSTO? what does this imply about the magnitude of $R^2$ and $r$?
+
+```{r}
+mylm <-lm(Y ~ X, data=p1.27)
+plot((Y-(156.347- 1.19*X)) ~ X, data=p1.27, main="Y_i - Y_i hat")
+plot(((156.347- 1.19*X)-mean(p1.27$Y)) ~ X, data=p1.27, main="Y_i hat - Y bar")
+```
+
+The SSR would appear to be bigger than SSE, this would make $R^2$ bigger than 0.5, probably between 0.6 and 0.8.
+
+b. Set up the ANOVA table.
+
+```{r}
+myaov <- aov(Y ~ X, data=p1.27)
+summary(myaov)
+```
+
+c. Test whether or not $\beta_1 = 0$ using an F test with $\alpha=.05$. State the alternatives, descision rule, and conclusion.
+
+$H_0: \beta_1=0$
+
+$H_a: \beta_1 \ne 0$
+
+```{r}
+qf(1-0.05, 1, 58)
+```
+
+The decision rule is $If F* \le 4.01$ then conclude the null, otherwise conclude the alternative. 
+
+Since 174.1 is greater than 4.01 we conclude the alternative.
+
+d. What proportion of the total variation in muscle mass remains "unexplained" when age is introduced into the anlysis? IS this proportion relatively small or large?
+
+Since SSE is the unexplained variation, and $R^2 = SSR/SSTO = 0.7501$, is the explained variation, $SSE/SSTO = 1 - R^2$. 
+
+Thus the answer is .2499, which is relatively small.
+
+e. Obtain $R^2$ and $r$. 
+
+r=.8661
+
+### Problem 2.30 <span id=points>{5}</span><span id=report>{ / }</span> 
+
+```{r p30}
+# Load the Data:
+p1.28 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR28.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.28) <- c("Y","X")
+```
+
+### Problem 2.32 <span id=points>{3}</span><span id=report>{ / }</span> 
+
+```{r p32}
+# Load the Data:
+p1.28 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR28.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.28) <- c("Y","X")
+```
+
+
+
+<br />
+
+
+
+ 
+
+ 
+ 
+ 
+ <style>
+#points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#report {
+  font-size:.7em;
+  padding-left:15px;
+  font-weight:normal; 
+  color:#5a5a5a;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+</style>
+
+
+ 
+
+ 

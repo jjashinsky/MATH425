@@ -1,0 +1,337 @@
+---
+title: "Project 5 - Referral Comparison"
+author: "Jacob Jashinsky & Shania Mauldin"
+date: "4/09/2018"
+output: 
+  html_document:
+    theme: cerulean
+    toc: false
+    toc_float: false
+    code_folding: hide
+
+---
+
+<script type="text/javascript">
+ function showhide(id) {
+    var e = document.getElementById(id);
+    e.style.display = (e.style.display == 'block') ? 'none' : 'block';
+ }
+</script>
+
+
+```{r, include=FALSE, warning=FALSE}
+library(mosaic)
+library(pander)
+library(ggplot2)
+library(readr)
+library(pander)
+library(lmtest)
+library(DT)
+# read in the data
+referrals2 <- read_csv("referrals2.csv")
+
+# renanme column names
+colnames(referrals2) <- c("RS", "Year", "Count", "M")
+
+# sum up the other sources with respect to year
+ref2 <- subset(referrals2, RS %in% c("OtherSources", "Direct Access"))
+
+# make RS a factor with 2 levels
+ref2$RS <- as.factor(ref2$RS)
+
+# Declare the linear model 
+ref2.lm <- lm(Count~I(Year-2013) + RS + I(Year-2013):RS, data=ref2)
+
+# subset to specific names
+ref2.names <- subset(referrals2, RS %in% c("Lijenquist, Joseph", "Huntsman, Casey", "Redd, Brigham", "Andary, John", "McCowin, Phil", "Lee, Robert", "Cach, Robert", "West, Gregory", "Dalling, Jason", "Biddulph, Greg"))
+
+# More names of interest 
+ref3.names <- subset(referrals2, RS %in% c("Walker, Eric", "Harris, Michael", "Southwick, Boyd", "Newhouse, Kenneth", "Plomaritis, Demetrios", "Ward, Reed", "Mason, Laura", "Hart, Trenton", "Coughenour, Tiffany", "Blackner, Kenneth", "The Pediatric, Center", "Roisum, Tony"))
+
+
+```
+
+
+### Introduction
+
+We have been ask by Jay Ellis to run an analysis on referral data for his company, Ellis Physical Therapy.  He gave us a list of doctors who had referred patients to his office from the years 2013-2017 (known as "OtherSources" in the data set).  He also gave us referrals given to them from Direct Access (known as "DirectAccess" in the data set).  He wanted to see a trend line of both of them, Direct Access and Other Sources, as well as obtaining trend lines for specific orthopedic doctors.  
+
+The fine details of the study, such as the model and diagnostics, can be viewed below but continue on to read the summary.  
+
+<a href="javascript:showhide('abstract')">Details of the Analysis<span style="font-size:8pt;">&nbsp;(click to view)</span></a>
+
+<div id="abstract" style="display:none;">
+
+
+### Analysis
+
+The analysis comes from the follow data set.  
+
+```{r, echo=FALSE}
+datatable(referrals2)
+
+```
+
+
+#### Model
+
+A multiple linear regression model is used for the analysis of the data. 
+
+$$
+Y_i = \beta_0 + \beta_1 X_{i1} + \beta_2 X_{i2} + \beta_3 X_{i1} X_{i2} + \epsilon_i 
+$$
+
+
+$$
+\begin{aligned}
+Y_i&=\text{Count} \ \text{(i.e. the number of referrals in a given year)}  \\
+X_{i1}&=\text{Year} \  \text{(2013 - 2017)}           \\
+X_{i2} &= \left\{\begin{array}{ll} 0, & \text{if RS} = \text{DirectAccess} \\ 1, & \text{if RS}= \text{OtherSource} \end{array}\right.
+\end{aligned}
+$$
+
+
+|Coefficient |    X-Variable    |     Meaning    |
+|-----------|------------------|----------------|
+| $\beta_0$ |                  | The average number of referrals from Direct Access in 2013 |
+| $\beta_1$ | $X_{i1}=\text{Year}$ and $X_{i2}=0$     | The change in referral count of Direct Access for every additional year|
+| $\beta_2$ | $X_{i2}=1$ | The increase or decrease in average referral count of OtherSource referrals in 2013|
+| $\beta_3$ | $X_{i1}=\text{Year}$ and $X_{i2}=1$ | The increase or decrease of change in referral count of OtherSource for every additional year|
+
+----
+
+#### 5 Number Summary
+
+The table below provides basic statistics of every referral collected. 
+
+```{r}
+# to provide basic stats of the data
+pander(favstats(Count ~ RS, data=ref2))
+```
+
+The highest number of referrals in a year from Other Sources is 650 and the lowest is 384, which has a difference of 266. That is a 41% drop in referrals from the maximum amount. 
+
+The highest number of referrals in a year from Direct Access is 160 and the lowest is 75. That gives us a difference of 85, which is a reduction of 53% from the maximum amount.  
+
+----
+
+
+### Checking Requirements
+
+Before running the multiple linear regression test, requirements must be checked to ensure accurate results.  
+
+#### Autocorrelation Check 
+
+Significance level for P-value to be compared is at 0.05.  A Durbin-Watson test will be performed to check for autocorrelation.  
+
+The null hypothesis is the error terms are independent, meaning autocorrelation is zero and the alternative hypothesis is the error terms are correlated, meaning there is positive autocorrelation.
+
+
+$$
+Ho: \rho = 0 \\
+Ha: \rho >0 
+$$
+ 
+
+```{r}
+pander(dwtest(ref2.lm)) 
+```
+
+The conclusion is to fail to reject the null hypothesis, meaning the data is not autocorrelated.  No autocorrelation means it is good because now it is possible to use a linear regression model to test the data.  If not, further transformations of the model would have been needed. 
+
+#### Linearity and Variance Testing 
+
+```{r}
+par(mfrow=c(1:2))
+plot(ref2.lm, which=1:2)
+
+```
+
+The first plot suggests that a linear model would be a good fit for the data because all points are scattered and no real pattern exists. This is confirmed with the red line which is relatively flat. 
+The spread of the points also leads us to conclude that the error terms have constant variance. 
+
+The second plot is useful for determining whether or not the error terms are normally distributed. All points should  be close to the line, however points (7) and (8) appear to a bit far from the line but not enough to hinder the results of the study.
+
+Over all these plots show really good signs and nothing here should lead to inaccurate results. 
+
+#### Cook's Distance 
+
+```{r}
+
+plot(ref2.lm, which=4)
+```
+
+Cook's distance plots suggests that point (1) is an outlier, meaning that it is different from what we expected it to be. Based on the graph it doesn't appear to have much of an influence so it shouldn't be much of a concern.   
+
+
+----
+
+
+### Tests Results
+
+To validate the test results a significance level is required.  The significance level will be what is compared to the P-value in validating the results.  
+
+Significance level:  
+
+$$
+\alpha = 0.05
+$$
+
+Results of fitting the model to the data.  
+
+```{r}
+# the current lm model
+ref2.lm <- lm(Count~I(Year-2013) + RS + I(Year-2013):RS, data=ref2)
+pander(summary(ref2.lm))
+```
+
+
+According to the results, all of the P-values (**Pr(>|t|)**), the intercept, year, referral sources, and the interaction between the year and the referral sources are significant.  Due to the significance, predictions can be made from the model. 
+
+#### Response functions
+
+These response functions can be used to predict the referral amount for a given year for Direct Access or Other Sources. 
+
+Any year can be substituted in for X, but the equation is set up for zero as 2013.  For example, if a prediction of 2018 would mean substituting in a five for the X value.  
+
+The slope of the Direct Access (DA) line is -17.6 and the intercept is 141.2.  For every future year, there is a 17.6 decrease in Direct Access referrals. Thus, for every additional year, it is expected to loose approximately 17.6 Direct Access referrals.  
+
+$$
+E \{ Y_{DA} \} = 141.2 -17.6 X
+$$
+
+The slope of the Other Sources (OS) line is -64.3 and the intercept is 642.2.  For every future year, there is a 64.3 decrease in Other Sources referrals.  Thus, for every additional year, it is expected to loose approximately 64.3 Other Sources referrals.  
+
+$$
+E \{ Y_{OS} \}= 642.2 - 64.1 X
+$$
+
+</div>
+
+----
+
+### Summary of the Study
+
+The table below summaries the totals by year for each source. 
+
+| Referral Source  | 2013 | 2014 | 2015 | 2016 | 2017 |
+|------------------|------|------|------|------|------|
+|Direct Access     | 160  | 116  | 75   | 98   | 81   |
+|Other Source      | 650  | 577  | 491  | 468  | 384  |
+
+Other Source referrals were always decreasing from year to year, while Direct Access decreased and then increased in 2016 but then decreased once again. 
+
+This table below provides the general statistics of the table above.  
+
+```{r}
+# to provide basic stats of the data
+pander(favstats(Count ~ RS, data=ref2))
+```
+
+It is interesting to note that the highest number of referrals in a year from Other Sources is 650 and the lowest is 384, which has a difference of 266. That is a 41% drop in referrals since 2013. 
+
+The highest number of referrals in a year from Direct Access is 160 and the lowest is 75. That gives us a difference of 85, which is a reduction of 53% since 2013. 
+
+----
+
+These dramatic drops can be seen in the plot below.
+
+```{r}
+ggplot(data = ref2, aes(x = Year, y = Count)) + 
+  geom_point()  + 
+  aes(colour = RS)  + 
+  stat_smooth(method = lm) + 
+  labs(title = "Estimation of Referral Count Based on Year and Referral Source")
+```
+
+The plot shows the total referral count for the given years. Included in the plot is the regression line. This line can be used to estimate and predict into future years. It is clear that referral count for Other Sources is decreasing at a faster rate than the Direct Access referrals.  
+
+The shaded region depicts the likely variability of the line. Meaning that these lines could really be shifted up slightly higher or lower, but could also be tilted upwards or downwards. We are however, 95% confident that those lines will stay within the shaded region.  
+
+----
+
+The importance of those lines is that it allows us to make predictions about the upcoming years.
+
+The lines show that there is general negative trend. Direct Access referrals are expected to drop by 17.6 each year. With that loss in mind, the expected total for 2018 and 2019 are 53.2 and 35.6 respectively.
+
+OtherSource referrals are expected to drop by 64.1 each year, which implies that the expected total for OtherSource in 2018 and 2019 are 321.7 and 257.6 respectively.
+
+That is, however, only what should be expected on average. It is certainly possible that referrals total can drop below or above those estimates.   
+
+Another powerful prediction tool is called a "Prediction Interval", or "PI", which are an estimation for a specific year. It no longer refers to averages but what the actual total could be.   
+
+Below are the PI's for the years 2018 and 2019. The "fit" column is what the line predicts the average to be, while the "lwr" and "upr" columns give lower and upper range of where the year's total could be. (Please note that any negative values will be considered a zero because there cannot be negative counts.)       
+
+```{r}
+ pander(predict(ref2.lm, data.frame(Year = c(2018,2019), RS = "Direct Access"), level = (1-0.05/4), interval = "prediction"), caption= "Direct Access 95% PI for 2018 (top)   & 2019 (bottom)") 
+```
+
+These intervals show that by the end of this current year the total referrals for Direct Access could be as low as 0 or as high as 157.2. Direct Access in 2017 ended with a total of 81. So it is still certainly possible that 2018 could see an increase just like it did back in 2016. The interval for 2019 shows a similar scenario.      
+
+```{r}
+ pander(predict(ref2.lm, data.frame(Year = c(2018,2019), RS = "OtherSources"), level = (1-0.05/4), interval = "prediction"), caption= "Other Sources 95% PI for 2018 (top) & 2019 (bottom)")
+```
+
+The story is similar for Other Source. The total referral count in 2018 could be as low as 217.7 but as high as 425.7. The year 2017 saw a total of 384 referrals by the end of the year so Other Source still has a slight chance to increase. The situation is no different for 2019. 
+
+Despite the possible increase in the future years there is still a strong negative correlation. There is something that is causing referrals to decrease, whether it is because of competition or a policy change.   
+
+----
+
+#### Individuals of Interest
+
+Jay Ellis wanted to see referral trends for certain individuals.  The plots show the amount of referrals from each individual per given year. No predictions can be made about their future behaviors but a general trend can be seen from the data at hand. 
+
+Some doctors, such as Casey Huntsman had a significant drop in referral count. Gregory West appeared to stay relatively constant throughout the years while Jason Dalling actually increased slightly.
+
+```{r}
+ggplot(data = ref2.names, aes(x = Year, y = Count)) + 
+  geom_point()  + 
+  aes(colour = RS) + 
+  facet_wrap(~RS, ncol = 4) + 
+  labs(title = "Trends of each Individuals' Referral Count") +
+  stat_smooth(method = lm, se=F) +
+  theme(axis.text.x = element_text(angle=90))
+```
+
+
+```{r, eval=FALSE}
+# to provide basic stats of the data
+pander(favstats(Count ~ RS, data=ref2.names), caption="General Statistics")
+```
+
+#### Others of Interest 
+
+We identified twelve more individuals beyond the other eight with differing trends. Some had constant trends and others had increasing or decreasing trends. 
+
+For example, there are few who did not change much over the years, while others like Tony Roisum and The Pediatric Center changed quite a bit. 
+
+Reed Ward showed a downward trend but his referrals were increasing from 2013-15.  
+
+```{r}
+ggplot(data = ref3.names, aes(x = Year, y = Count)) +
+  geom_point()  +
+  aes(colour = RS) + 
+  facet_wrap(~RS, ncol = 4) +
+  stat_smooth(method = lm, se=F) +
+  labs(title = "Trends of each Individuals' Referral Count") +
+  theme(axis.text.x = element_text(angle=90))
+```
+
+
+```{r, eval=FALSE}
+# to provide basic stats of the data
+pander(favstats(Count ~ RS, data=ref3.names), caption="General Statistics")
+```
+
+
+Many doctors show a negative trend in the amount of referrals they send. There are some that had a general positive trend, but the majority show that they are sending less each year or staying about the same.
+
+
+----
+
+Special thanks to Jay Ellis for providing the data and the opportunity. 
+
+
+
+

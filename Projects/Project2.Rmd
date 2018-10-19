@@ -1,0 +1,483 @@
+---
+title: "Project 2 -- Regression Battleship"
+author: "Jacob Jashinsky"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+library(mosaic)
+```
+
+
+## Step 1. Creating your Data
+
+There are only three general rules that you must follow in the creation of your data set.
+
+1. Your data set must have one "Y" variable and 20 "X" variables labeled as "Y", "X1", ..., "X20". 
+
+2. Your response variable $Y$ must come from a linear regression model that satisfies:    
+$$
+  Y_i^\prime = \beta_0 + \beta_1 X_{i1}^\prime + \ldots + \beta_{p-1}X_{i,p-1}^\prime + \epsilon_i  
+$$
+where $\epsilon_i \sim N(0,\sigma^2)$ and $p\leq 21$.
+
+3. All $X$-variables that were used to create $Y$ are contained in your data set. 
+
+```{r}
+set.seed(21) #This ensures your randomness is the "same" everytime.
+
+# To begin, decide on your sample size:
+
+ n <- 50
+  
+ #Then, create up to 21 X-variables.
+
+ sigma <- 12
+   
+ ################################
+ # You CANNOT change this part:
+errors <- rnorm(n, 0, sigma)
+ ################################ 
+ runifdisc<-function(n, min=0, max=1) sample(min:max, n, replace=T)
+ 
+X1 <- runif(n, 0 , 50)
+X2 <- rexp(n, 2)   ##
+X3 <- rgamma(n, 10,20) ##
+
+hist(X3)
+
+X5 <- 5 + 2*X1 + 10 + rnorm(n, 0, 20)
+X6 <- runifdisc(n, min=0, max=1)
+X7 <- runifdisc(n, min=1, max=4)   ## 
+X8 <- runifdisc(n, min=1, max=6)
+X9 <- rchisq(n, 12, 2)
+X10 <- X9 * X8 + rnorm(n, 1, 20)
+X11 <- rpois(n, 42)
+X12 <- rlogis(n, 34, 82)
+X13 <- rhyper(n, 100, 66, 12)
+X14<- rweibull(n, 1324, 371)
+X15 <- rcauchy (n, 32, 1)
+X16 <- runif(n, 20, 30)
+X17 <- X1*(1.2)
+X18 <- sample(c(1,2,3,4,5), n, replace=TRUE)
+X19 <- sample(c(1), n, replace=TRUE) 
+X20 <- beaver2$temp[1:50]
+X4 <- 7 * X9 + errors
+
+# Creating the model
+
+beta0 <- 20
+beta1 <- 6.3
+beta2 <- 6
+beta3 <- 1.2
+
+ Y <- beta0 + beta1*X2 + beta2*X3 + beta3*X2*(X7==4) + errors
+
+ 
+ 
+ # You may have to create "useless" variables
+ # to fill this dataset in, but you must have 20 X-variables
+ # when you are done, and the X variables used to create
+ # the regression above must be included in this 20. 
+ # However, you do not have to include Y' or any of the X'.
+ yourData <- data.frame(Y=Y, 
+                        X1=X5,
+                        X2=X2,
+                        X3=X19,
+                        X4=X4,
+                        X5=X1, 
+                        X6=X7,
+                        X7=X20,
+                        X8=X8,
+                        X9=X9,
+                        X10=X6, 
+                        X11=X10,
+                        X12=X11,
+                        X13=X12,
+                        X14=X13,
+                        X15=X14,
+                        X16=X15,
+                        X17=X16,
+                        X18=X3,
+                        X19=X17,
+                        X20=X18)
+write.csv(yourData, "yDat.csv", row.names=FALSE)
+# The above code writes the dataset to your "current directory"
+# To see where that is, use: getwd() in your Console.
+```
+
+using X2, X6 and X18
+
+```{r, fig.height=20, fig.width=20}
+# pairs(yourData)
+```
+
+
+## Step 2. Analyzing Brother Saunders's Data
+
+Brother Saunders followed the same 3 rules that were outlined above in the creation of his data. You need to analyze his data to try to make a guess at his true regression model. Document your approach as best you can and state your final predictions here. 
+
+```{r}
+sData <- read.csv("sDat.csv", header=TRUE)
+```
+
+```{r}
+cor(sData)
+```
+
+
+
+```{r, fig.width=22, fig.height=22}
+pairs(sData)
+```
+
+X1 and X6 looked interesting. I am going to explore those. 
+
+```{r}
+lm1 <- lm(Y ~ X1, data=sData)
+summary(lm1)
+plot(lm1, which=1)
+plot(lm1, which=2)
+```
+
+that doesn't seem to add much. 
+
+Lets look at X6
+
+```{r}
+lm2 <- lm(Y ~ X6, data=sData)
+summary(lm2)
+plot(lm2, which=1)
+plot(lm2, which=2)
+```
+
+X6 certainly has some play here. 
+
+Lets keep it in the model and plot some added variability plots 
+
+```{r, fig.width=22, fig.height=22}
+pairs(cbind(R=lm2$res, sData), col=sData$X6+1)
+```
+
+X8 now looks like it might have information for me. Lets take a closer look at it. 
+
+```{r}
+plot(lm2$residuals ~ X8, data=sData, col=sData$X6+1)
+```
+
+```{r}
+plot(Y ~ X8, data=sData, col=X6+1)
+```
+
+There are clearly two different lines here. Lets add X8 into to the model with an interaction term.
+
+```{r}
+lm3 <- lm(Y ~ X6 + X8 + X6:X8, data=sData)
+summary(lm3)
+plot(lm3, which=1:2)
+```
+
+Linearity is great and normality is okay, but we do not have constant variance. 
+
+This can be seen the graph below. 
+
+
+```{r}
+plot(Y ~ X8, data=sData, col=X6+1)
+b <- lm3$coefficients
+abline(b[1], b[3], col="black")
+abline(b[1]+b[2], b[3] + b[4], col="red")
+```
+
+
+```{r}
+lm11 <- lm(Y ~ X8, data=subset(sData, X6==1))
+summary(lm11)
+plot(lm11, which=1:2)
+```
+
+
+```{r}
+plot(Y ~ X8, data=subset(sData, X6==1, col=X6+1))
+b <- lm11$coefficients
+abline(b[1], b[2], col="black")
+```
+
+
+
+```{r}
+#lm12 <- lm(I(Y^-1) ~ I(X8^-1), data=subset(sData, X6==1))
+#summary(lm12)
+#plot(lm12, which=1:2)
+```
+
+
+```{r}
+#plot(I(Y^-1) ~ I(X8^-1), data=subset(sData, X6==1, col=X6+1))
+#b <- lm12$coefficients
+#abline(b[1], b[2], col="black")
+```
+
+
+
+A transformation on Y might be able to fix this. 
+
+But before we explore that option lets look at the possibility of adding additional terms. 
+
+Lets explore this by viewing added variable plots with our current model.  
+
+after color several different factors, X15 reveals some great information. 
+
+```{r, fig.width=22, fig.height=22}
+pairs(cbind(R=lm3$res, sData), col=sData$X15+1)
+```
+
+Lets add X8 to the model
+
+```{r}
+lm4 <- lm(Y ~ X6 + X8 + X8:X6 + X15, data=sData)
+summary(lm4)
+plot(lm4, which=1:2)
+```
+
+Variance got way worse, and p-values increased. 
+
+An interaction term may be good, so an added variables plot would be good. 
+
+```{r}
+plot(lm4$residuals ~ I(X15*X8), data=sData)
+plot(lm4$residuals ~ I(X15*X6), data=sData)
+plot(lm4$residuals ~ I(X15*X8*X6), data=sData)
+```
+
+
+```{r}
+lm5 <- lm(Y ~ X6 + X8 + X6:X8 + X15 + X15:X8 + X15:X8:X6, data=sData )
+summary(lm5)
+plot(lm5, which=1:2)
+```
+
+```{r}
+lm6 <- lm(Y ~  X8 + X6:X8 + X15 + X15:X8 + X15:X8:X6, data=sData )
+summary(lm6)
+```
+
+```{r}
+plot(lm5$residuals ~ lm5$fitted.values, col=sData$X6+1)
+```
+
+```{r}
+lm6 <- lm(Y ~ X8 + X15 + X15:X8 + X8:X6, data=sData )
+summary(lm6)
+plot(lm6, which=1:2)
+```
+
+```{r}
+for (i in 1:50){
+  if(sData$X6[i]==1 & sData$X15[i]==1){
+  sData$X21[i] <- 4
+  }
+  if(sData$X6[i]==1 & sData$X15[i]==0){
+  sData$X21[i] <- 3
+  }
+  if(sData$X6[i]==0 & sData$X15[i]==1){
+  sData$X21[i] <- 2
+  }
+  if(sData$X6[i]==0 & sData$X15[i]==0){
+  sData$X21[i] <- 1
+  }
+  
+}
+b <- lm6$coefficients
+plot(Y ~ X8, data=sData, col=X21)
+abline(b[1], b[2])
+abline(b[1], b[2]+b[5], col="green")
+abline(b[1] + b[3], b[2] + b[4] + b[5], col="blue")
+abline(b[1] + b[3], b[2] + b[4], col="red")
+```
+
+
+## Step 3. Final Synthesis
+
+
+This will be completed after Brother Saunders returns to you his guess at your true model. Document the approach Brother Saunders used to uncover your true regression model. State what things worked well and what things did not. How well did he recover your true regression model? Did he recover a mathematically equivalent version of your regression model?
+
+Use the ideas from Section 9.6 to compare how well Brother Saunders's model compares to your true model for the given dataset.
+
+
+```{r}
+set.seed(121) #This ensures your randomness is the "same" everytime.
+
+# To begin, decide on your sample size:
+
+ n <- 50
+  
+ #Then, create up to 21 X-variables.
+
+ sigma <- 12
+   
+ ################################
+ # You CANNOT change this part:
+errors <- rnorm(n, 0, sigma)
+ ################################ 
+ runifdisc<-function(n, min=0, max=1) sample(min:max, n, replace=T)
+ 
+X1 <- runif(n, 0 , 50)
+X2 <- rexp(n, 2)   ##
+X3 <- rgamma(n, 10,20) ##
+X5 <- 5 + 2*X1 + 10 + rnorm(n, 0, 20)
+X6 <- runifdisc(n, min=0, max=1)
+X7 <- runifdisc(n, min=1, max=4)   ## 
+X8 <- runifdisc(n, min=1, max=6)
+X9 <- rchisq(n, 12, 2)
+X10 <- X9 * X8 + rnorm(n, 1, 20)
+X11 <- rpois(n, 42)
+X12 <- rlogis(n, 34, 82)
+X13 <- rhyper(n, 100, 66, 12)
+X14<- rweibull(n, 1324, 371)
+X15 <- rcauchy (n, 32, 1)
+X16 <- runif(n, 20, 30)
+X17 <- X1*(1.2)
+X18 <- sample(c(1,2,3,4,5), n, replace=TRUE)
+X19 <- sample(c(1), n, replace=TRUE) 
+X20 <- beaver2$temp[1:50]
+X4 <- 7 * X9 + errors
+
+
+# Creating the model
+
+beta0 <- 20
+beta1 <- 6.3
+beta2 <- 6
+beta3 <- 1.2
+
+ Y <- beta0 + beta1*X2 + beta2*X3 + beta3*X2*(X7==4) + errors
+
+ 
+ 
+ # You may have to create "useless" variables
+ # to fill this dataset in, but you must have 20 X-variables
+ # when you are done, and the X variables used to create
+ # the regression above must be included in this 20. 
+ # However, you do not have to include Y' or any of the X'.
+ yourDataNew <- data.frame(Y=Y, 
+                        X1=X5,
+                        X2=X2,
+                        X3=X19,
+                        X4=X4,
+                        X5=X1, 
+                        X6=X7,
+                        X7=X20,
+                        X8=X8,
+                        X9=X9,
+                        X10=X6, 
+                        X11=X10,
+                        X12=X11,
+                        X13=X12,
+                        X14=X13,
+                        X15=X14,
+                        X16=X15,
+                        X17=X16,
+                        X18=X3,
+                        X19=X17,
+                        X20=X18)
+```
+
+## My Model
+
+$$
+Y_i = 20 + 6.3X_{i2} + 6X_{i18} + 1.2X_{i2}(X_{i6}==4) + \epsilon_i
+$$
+
+```{r}
+Slm <- lm(Y ~ X2 + X4 + X9 + X18 + X2:I(X6==4), data=yourData)
+Truelm <- lm(Y ~ X2 + X18 + X2:I(X6==4), data=yourData)
+```
+
+```{r}
+summary(Slm)
+summary(Truelm)
+```
+
+```{r}
+summary(lm(Y ~ X2 + X18 + X2:I(X6==4), data=yourDataNew))
+summary(lm(Y ~ X2 + X4 + X9 + X18 + X2:I(X6==4), data=yourDataNew))
+```
+
+```{r}
+SYhat <- predict(Slm, yourDataNew)   # Using old model to predict the new Y
+TrueYhat <- predict(Truelm, yourDataNew)  # Using old model to predict the new Y
+```
+
+
+MSPE with the True model and Saunder's Model. 
+
+```{r}
+sum(TrueYhat - yourDataNew$Y)^2 / 50
+sum(SYhat - yourDataNew$Y)^2 /50
+```
+
+Saunder's model preformed much better than our model. There was however a error in the original data set. X4 and X9 were correlated together, but the error terms were also used in the correlating the variables. This you were able to use to explain the model in its entirety, because we essentially replaced the error terms with variables in the data set.  
+
+
+
+
+
+
+
+<style>
+#points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+</style>
+
+
+<footer>
+</footer>
+
+
+
+ 
+
+ 
+
+ 
+
+ 

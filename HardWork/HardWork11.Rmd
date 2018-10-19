@@ -1,0 +1,345 @@
+---
+title: "Hard Work 11"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+
+```{r, message=FALSE, warning=FALSE}
+# Install the party library
+# Run once: install.packages("party")
+library(party)
+library(MASS)
+```
+
+<style>
+
+</style>
+
+## Instructions
+
+1. Study Sections 11.4 (first) and then 11.3 -- "Regression Trees and Robust Regression."
+
+2. Attempt and submit at least <span id=points style="padding-left:0px;">{44}</span> Hard Work Points by Saturday at 11:59 PM.    
+<span id=note>Over <span id=points style="padding-left:0px;">{47}</span> gets you {+1} Final Exam Point.</span>    
+
+
+## Reading Points <span id=headpoints>{19} Possible</span>
+
+### Section 11.4 <span id=rrecpoints>{7}</span><span id=report>{ 7 / 7 }</span>
+
+
+### Section 11.3 <span id=rrecpoints>{12}</span><span id=report>{ 11 / 11 }</span>
+
+
+
+
+## Theory Points <span id=headpoints>{4} Possible</span>
+
+### Problem 11.2 <span id=points>{2}</span><span id=report>{ 2 / 2 }</span>
+
+Outliers aren't always annoying data points we hope to cover up or forget about. Sometimes they can provide great insight. Perhaps they indicate that we are missing essential information in our model or data. It could indicate that more research needs to be done and we shouldn't simply do a robust regression and forget about it.  
+ 
+### Problem 11.4 <span id=points>{2}</span><span id=report>{ 1 / 2 }</span>
+
+
+Using a regression tree with many predictor variables and small sample size would result in large amounts of partitions but small amounts of data points falling in each region. The mean of each region is therefore more susceptible to outliers and will not accurately represent the truth.
+
+
+
+
+## Application Points <span id=headpoints>{25} Possible</span>
+
+
+<a id=datalink style="font-size:.9em;" target="_blank" href=http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/index.html>Data Files</a>
+
+### Problem CO2 <span id=recpoints>{10}</span><span id=report>{ 9 / 10 }</span>
+
+Create a graphic similar to Figure 11.9 of the textbook for the CO2 data. 
+Interpret your graphic.
+
+
+```{r}
+# Set eval=TRUE to run this code.
+ctree <- ctree(uptake ~ conc + Treatment + Type, data=CO2)
+plot(ctree, type="simple")
+
+# Hint
+palette(c("#FBB4AE", "#B3CDE3", "#CCEBC5", "#DECBE4"))
+plot(uptake ~ conc, data=CO2, col=interaction(Type,Treatment), pch=16)
+lines(c(0, 175), c(20.575,20.575), lwd=3, col="gray71")
+lines(c(175, 500), c(37.383,37.383), lwd=3, col="gray71")
+lines(c(500, 1000), c(40.75,40.75), lwd=3, col="gray71")
+lines(c(0, 250), c(19.678,19.678), lwd=3, col="#B3CDE3")
+lines(c(250, 1000), c(30.658,30.658), lwd=3, col="#B3CDE3")
+lines(c(0, 250), c(13.489, 13.489), lwd=3, col="#DECBE4")
+lines(c(250, 1000), c(17.558,17.558), lwd=3, col="#DECBE4")
+
+
+```
+
+The graphic clearly shows that there is a big difference between plants from Quebec and Mississippi. For Quebec plants treatment had non-significance effect, but concentration did. Quebec plants with conc less than 175 have an average height of 20.575. But if conc is higher than 175 and lower than 500 then the average height is 37.383, otherwise the average height is 40.75. 
+
+For Mississippi plants treat had a significant effect. nonchillled plants with concentration less then 250 should expect be around 19.67 in height and any chilled MI plants above conc of 250 has an average of 30.658. 
+
+MI chilled plants with conc lower than 250 had an average of 13.489 while conc higher than 250 had an average of 17.558. 
+
+In recap, Quebec plants had a higher average over MI plants, but treatment had little to no effect on height. For MI plants, treatment had a large effect, where non-chilled had the great impact on height.  
+
+
+### Problem 11.11 <span id=recpoints>{7}</span><span id=report>{ 7 / 7 }</span> 
+
+```{r}
+# Code to read in the data
+# It has to be merged from the 1.20 and 8.15 data files.
+p11.11 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%2011%20Data%20Sets/CH11PR11.txt", header=FALSE)
+
+p1.20 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%201%20Data%20Sets/CH01PR20.txt", header=FALSE)
+
+p11.11 <- rbind(p1.20, p11.11)
+
+# Give it nice column names for conevience:
+colnames(p11.11) <- c("Y","X1")
+
+# Show the data:
+# p11.11
+```
+
+**a.**
+
+The red line is the regression line when case 46 and 47 are not included. 
+
+```{r}
+p11.11new <- p11.11[-c(46,47), ]
+
+p11new.lm <- lm(Y ~ X1, data=p11.11new)
+p11.lm <- lm(Y ~ X1, data=p11.11)
+plot(Y ~ X1, data=p11.11)
+abline(p11new.lm, col="red")
+abline(p11.lm)
+
+plot(p11.lm, which=4)
+```
+
+There is actually very little of an effect when the outliers are added. This is because the outliers in more in the middle of the data and not at the end points. 
+
+**b.**
+
+```{r}
+MAD <- (1/.6745)* median(abs( p11.lm$residuals - median(p11.lm$residuals)  ) )
+u <- p11.lm$residuals / MAD
+w <- 1.345 / abs(u)
+w[abs(u) <= 1.345] <- 1 
+w
+```
+
+The last two received the smallest weights because they were the largest outliers. 
+
+**c.**
+
+```{r}
+p11I1 <- lm(Y ~ X1, weights=w, data=p11.11)
+summary(p11I1)
+summary(p11.lm)
+```
+
+The first iteration of IRLS has a slightly larger beta1 and beta0 decreased by little under 2. Very slight changes.
+
+**d.**
+
+
+```{r}
+MAD <- (1/.6745)* median(abs( p11I1$residuals - median(p11I1$residuals)  ) )
+u <- p11I1$residuals / MAD
+w <- 1.345 / abs(u)
+w[abs(u) <= 1.345] <- 1 
+w
+p11I2 <- lm(Y ~ X1, weights=w, data=p11.11)
+
+MAD <- (1/.6745)* median(abs( p11I2$residuals - median(p11I2$residuals)  ) )
+u <- p11I2$residuals / MAD
+w <- 1.345 / abs(u)
+w[abs(u) <= 1.345] <- 1 
+w
+p11I3 <- lm(Y ~ X1, weights=w, data=p11.11)
+
+summary(p11I3)
+summary(p11.lm)
+```
+
+The last two still receive the smallest weights and they are quite small now. 19 also is below .5. 
+
+For the final iteration of IRLS the beta1 is still slightly larger but beta0 lower by 3.56. This makes about a 4 minute difference in call time. 
+
+**e.**
+
+```{r}
+plot(Y ~ X1, data=p11.11)
+abline(p11.lm)
+abline(p11I3, col="red")
+```
+
+
+There is not a substantial difference but I would still prefer and trust the robust regression over the simple regression. 
+
+### Problem 11.12 <span id=recpoints>{8}</span><span id=report>{ 8 / 8 }</span> 
+
+```{r}
+# Code to read in the data
+# It has to be merged from the 1.20 and 8.15 data files.
+p11.12 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%2011%20Data%20Sets/CH11PR12.txt", header=FALSE)
+
+# Give it nice column names for conevience:
+colnames(p11.12) <- c("Y","X1")
+
+# Show the data:
+# p11.12
+```
+
+**a.**
+
+
+```{r}
+p12.lm <- lm(Y ~ X1, data=p11.12)
+plot(Y ~ X1, data=p11.12)
+
+abline(p12.lm)
+plot(p12.lm, which=4)
+```
+
+The cook distance plot suggests that there is an outlier, maybe two or three. 
+
+These outliers are apparent in the graph as well. There is a general positive slope. 
+
+**b.**
+
+```{r}
+MAD <- (1/.6745)* median(abs( p12.lm$residuals - median(p12.lm$residuals)  ) )
+u <- p12.lm$residuals / MAD
+w <- 1.345 / abs(u)
+w[abs(u) <= 1.345] <- 1 
+w
+
+```
+
+Only 2 and 3 recieved smaller weights, this is because they were the largest outliers accoring to the trend of the data.  
+
+**c.**
+
+```{r}
+p12I1 <- lm(Y ~ X1, weights=w, data=p11.12)
+summary(p12I1)
+summary(p12.lm)
+```
+
+The first IRLS has a much smaller beta0 and a slightly higher beta1. 
+
+```{r}
+plot(Y ~ X1, data=p11.12, main="Simple linear (black) with first iteration of IRLS (red)")
+abline(p12.lm)
+abline(p12I1, col="red")
+```
+
+
+**d.**
+
+
+```{r}
+MAD <- (1/.6745)* median(abs( p12I1$residuals - median(p12I1$residuals)  ) )
+u <- p12I1$residuals / MAD
+w <- 1.345 / abs(u)
+w[abs(u) <= 1.345] <- 1 
+w
+p12I2 <- lm(Y ~ X1, weights=w, data=p11.12)
+
+MAD <- (1/.6745)* median(abs( p12I2$residuals - median(p12I2$residuals)  ) )
+u <- p12I2$residuals / MAD
+w <- 1.345 / abs(u)
+w[abs(u) <= 1.345] <- 1 
+w
+p12I3 <- lm(Y ~ X1, weights=w, data=p11.12)
+
+summary(p12I3)
+summary(p12.lm)
+```
+
+The weights haven't changed much. Still only 2 and 3 received any change. 
+
+The final iteration of IRLS has a beta0 that is about 50 inches lower and the beta1 is about .7 higher. 
+
+```{r}
+lmR <- rlm(Y ~ X1, data=p11.12)
+plot(Y ~ X1, data=p11.12, main="Simple linear (black) with third iteration of IRLS (red)")
+abline(p12.lm)
+abline(p12I3, col="red")
+```
+
+
+
+<footer>
+</footer>
+
+
+
+ 
+ <style>
+ #points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#rrecpoints {
+  font-size:1em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#report {
+  font-size:.7em;
+  padding-left:15px;
+  font-weight:normal; 
+  color:#5a5a5a;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+ </style>
+
+ 
+
+ 
+
+ 

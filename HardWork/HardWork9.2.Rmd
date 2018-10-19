@@ -1,0 +1,283 @@
+---
+title: "Hard Work 9.2"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r}
+# This function will be useful later on.
+makeTable9.3 <- function(thedata, nbest=1){
+  
+  if (nbest < 1 | nbest > dim(thedata)[2]-1){
+    warning("nbest recoded to 1")
+    nbest <- 1
+  }
+  
+  cnames <- colnames(thedata)
+
+  Yat <- grep("Y",cnames)
+  
+  if (length(Yat)>1)
+    stop("Currently you have: ", paste(cnames[Yat], ", ", sep=""), 
+               " in your data set.\n There can be only one response variable.\n",
+               sep="")
+
+  colnames(thedata)[Yat] <- "Y"
+  Xat <- grep("X",cnames)
+  
+  require("leaps")
+  require("qpcR")
+
+  reg <- regsubsets(thedata[,Xat],thedata[,Yat], nbest=nbest, nvmax=length(cnames)-1)
+
+  regs <- summary(reg)
+  
+  models <- sapply(1:length(row.names(regs$which)), function(i){
+    colnames(regs$which)[which(regs$which[i,])][-1]
+  })
+  
+  pressdata <<- thedata
+  
+  PRESS <- sapply(models, function(model){
+    tmpf <- formula(paste("Y~",
+                          paste(model,
+                                c(rep("+",length(model)-1), ""), 
+                                sep="", 
+                                collapse=""), 
+                          sep=""))
+    tmp <- lm(tmpf, data=pressdata)
+    tmp$call$formula <- eval(tmpf)
+    PRESS(tmp, verbose=FALSE)$stat
+  })
+  
+  n <- nrow(thedata)
+  p <- as.numeric(row.names(regs$which))+1
+ 
+  
+  AIC <- regs$bic-log(n)*p-2*p
+
+  
+  AIC2 <- sapply(models, function(model){
+    tmpf <- formula(paste("Y~",
+                          paste(model,
+                                c(rep("+",length(model)-1), ""), 
+                                sep="", 
+                                collapse=""), 
+                          sep=""))
+    tmp <- lm(tmpf, data=pressdata)
+    tmp$call$formula <- eval(tmpf)
+    AIC(tmp)
+  })
+  
+  tmp <- data.frame(p=p, 
+             model= sapply(1:length(models), function(i) {
+                      paste(models[[i]], collapse=",")
+                    }),
+             SSEp=regs$rss,
+             R2p=regs$rsq,
+             R2ap=regs$adjr2,
+             Cp=regs$cp,
+             AICp=AIC2,
+             SBCp=regs$bic,
+             PRESSp=PRESS)
+  
+  rbind(data.frame(p=1,
+                   model="(intercept)",
+                   SSEp=regs$rss[1]/(1-regs$rsq[1]),
+                   R2p=0,
+                   R2ap=0,
+                   Cp=NA,
+                   AICp=NA,
+                   SBCp=NA,
+                   PRESSp=NA),tmp)
+}
+```
+
+
+## Instructions
+
+1. Study Section 9.6 -- "Model Validation"
+
+2. Attempt and submit <span id=points style="padding-left:0px;">{15}</span> Hard Work Points by Saturday at 11:59 PM.    
+
+
+## Reading Points <span id=headpoints>{7} Possible</span>
+
+### Section 9.6 <span id=rrecpoints>{7}</span><span id=report>{ 7 / 7 }</span>
+
+
+## Application Points <span id=headpoints>{8} Possible</span>
+
+
+<a id=datalink style="font-size:.9em;" target="_blank" href=http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/index.html>Data Files</a>
+
+### Problem 9.21 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span> 
+
+```{r}
+# Code to read in the data
+# It has to be merged from the 1.20 and 8.15 data files.
+p9.10 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%209%20Data%20Sets/CH09PR10.txt", header=FALSE)
+# Give it nice column names for conevience:
+colnames(p9.10) <- c("Y","X1","X2","X3","X4")
+
+# Show the first part of the data:
+#head(p9.10)
+```
+
+The model is $Y_i = \beta_0 + \beta_1 X1 + \beta_2 X3 + \beta_3 X4$
+```{r, warning=FALSE}
+makeTable9.3(p9.10)
+```
+
+```{r}
+summary(lm(Y ~ X1 + X3 + X4, data=p9.10))
+```
+
+Because PRESS_p is so over a 100 larger than SSE_p it is reasonable to suggest that the models predictive ability is lower than the model will claim, and that MSE_p is a biased estimator. 
+
+
+### Problem 9.22 <span id=recpoints>{6}</span><span id=report>{ 6 / 6}</span> 
+
+In part (b), swap each occurrence of the statement "Problem 9.18a" for "the significant model suggested by Problem 9.10c".
+
+```{r}
+# Code to read in the data
+# It has to be merged from the 1.20 and 8.15 data files.
+p9.22 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%209%20Data%20Sets/CH09PR22.txt", header=FALSE)
+# Give it nice column names for conevience:
+colnames(p9.22) <- c("Y","X1","X2","X3","X4")
+
+# Show the first part of the data:
+#head(p9.10)
+```
+
+**a.**
+
+
+```{r}
+cor(p9.10)
+cor(p9.22)
+```
+
+The correlation matrix shows that the training sample is similar in correlation to the correlations of the prediction set.  
+
+X2 is a little bit different, but considering that X2 is not in the model this won't be any concern for us. 
+
+**b.**
+
+```{r}
+summary(lm(Y ~ X1 + X3 + X4, data=p9.10))
+```
+
+```{r}
+summary(lm(Y ~ X1 + X3 + X4, data=p9.22))
+```
+
+The intercept has the most deviance, but all other coefficents and standard errors are very similar to the each other.  
+
+
+
+```{r}
+4.072^2
+4.072*21
+4.284^2
+4.284*21
+```
+
+
+**c.**
+
+MSPR = 4.284
+MSE = 4.072
+
+the difference is .21 
+
+This may be enough deviations to call it into question, but I would suggest that it is reasonably close. 
+
+This contradicts previous findings in p.21 which I concluded that MSE was baised. Because of the previous findings I am more likely to believe that MSE is baised. 
+
+**d.** 
+
+```{r}
+total <- rbind(p9.10, p9.22)
+```
+
+
+```{r}
+summary(lm(Y ~ X1 + X3 + X4, data=total))
+```
+
+All estimated standard deviations have been reduced when both data sets were combined. 
+
+
+
+<style>
+#points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#rrecpoints {
+  font-size:1em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#report {
+  font-size:.7em;
+  padding-left:15px;
+  font-weight:normal; 
+  color:#5a5a5a;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+</style>
+
+
+
+<footer>
+</footer>
+
+
+
+ 
+
+ 
+
+ 
+
+ 

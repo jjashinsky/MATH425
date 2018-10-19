@@ -1,0 +1,389 @@
+---
+title: "Hard Work 1"
+output: 
+  html_document:
+    theme: cerulean
+    code_folding: hide
+    toc: true
+    toc_float: true
+header-includes: 
+  - \usepackage{amsmath}
+---
+```{r, include=FALSE}
+library(mosaic)
+library(pander)
+library(car)
+```
+
+
+## Instructions
+
+1. Study Sections 1-5 of Chapter 1 -- "Linear Regression with One Predictor Variable."    
+<span id=note>(You may also choose to study Sections 6-8 if you are interested in the theory behind regression.)</span>
+
+2. Attempt and submit at least <span id=recpoints style="padding-left:0px;">{24}</span> Hard Work Points by Saturday at 11:59 PM.    
+<span id=note>Over <span id=points style="padding-left:0px;">{30}</span> gets you {+1} Final Exam Point.</span>    
+<span id=note>Over <span id=points style="padding-left:0px;">{40}</span> gets you {+2} Final Exam Points.</span>    
+<span id=note>Over <span id=points style="padding-left:0px;">{50}</span> gets you {+3} Final Exam Points.</span>
+
+<span id=recpoints>{...}</span> are "Recommended" and will earn you the minimum points required. 
+
+<span id=points>{...}</span> are optional, but the more of these you complete, the better.
+
+The format of reporting your score on each problem is: 
+
+**\{ Earned Points / Attempted Points \}**
+
+* **Attempted Points**: You gave the problem your time and energy, but aren't sure if you are completing the problem correctly or not. 
+* **Earned Points**: You are confident you have completed the problem correctly by comparing your work to the [Student Solutions](https://byui.brightspace.com/d2l/common/dialogs/quickLink/quickLink.d2l?ou=358268&type=content&rcode=byui_production-1198908), other students in class, or the examples in the book. This should always be less than or equal to **Attempted Points**.
+
+<br/>
+
+## Reading Points <span id=headpoints>{21} Possible</span>
+
+### Section 1.1 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+
+### Section 1.2 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+
+### Section 1.3 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+
+### Section 1.4 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span>
+
+
+### Section 1.5 <span id=recpoints>{2}</span><span id=report>{ 2 / 2 }</span>
+
+
+### Section 1.6 <span id=points>{3}</span><span id=report>{ 3 / 3 }</span>
+
+
+### Section 1.7 <span id=points>{2}</span><span id=report>{ 2 / 2 }</span>
+
+
+### Section 1.8 <span id=points>{3}</span><span id=report>{ 3 / 3 }</span>
+
+
+<br/>
+
+## Theory Points <span id=headpoints>{11} Possible</span>
+
+
+### Problem 1 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span>
+
+Recreate this chalkboard in your own handwriting 
+<!-- ![](SLRTheory.jpg) -->
+
+<!-- Uncomment the code below, and insert your own picture file path to load the picture of your version of this chalkboard.-->
+
+![](chalkboard.jpg)
+ 
+
+### Problems 1.29 and 1.30 <span id=points>{2}</span><span id=report>{ / }</span>
+ 
+### Problem 1.32 <span id=points>{2}</span><span id=report>{ / }</span>
+ 
+### Problem 1.33 <span id=points>{4}</span><span id=report>{ 4 / 4 }</span>
+
+**Derive the expression for $b_1$ in 1.10a from the normal equations in 1.9**
+
+Consider, 
+
+$$ 
+\sum Y_i = nb_0 + b_1 \sum X_i  \\
+\sum X_i Y_i = b_0 \sum X_i + b_1 \sum X_i^2
+$$
+Using the first equation we solve for $b_0$ to get,
+
+$$
+b_0 = \frac{\sum Y_i - b_1 \sum X_i}{n} 
+$$
+
+Now using that we substitute it into the second equation and solve for $b_1$. 
+
+$$
+\sum X_i Y_i = (\frac{\sum Y_i - b_1 \sum X_i}{n} ) \sum X_i + b_1 \sum X_i^2  \\
+\sum X_i Y_i = \frac{\sum X_i Y_i}{n} - \frac{b_1 \sum X_i^2}{n} + b_1 \sum X_i^2 
+$$
+
+Multiply the $n$ on both sides ande solve for $b_1$.
+
+$$
+n \sum X_i Y_i = \sum X_i Y_i - b_1 \sum X_i^2 + n b_1 \sum X_i^2    \\
+n\sum X_i Y_i - \sum X_i Y_i = b_1 (n\sum X_i^2-\sum X_i^2)   \\
+b_1 = \frac{n\sum X_i Y_i - \sum X_i Y_i}{n\sum X_i^2-\sum X_i^2}   
+$$
+Now additional terms, 
+
+$$
+b_1 = \frac{n\sum X_i Y_i - \sum X_i Y_i - \sum X_i Y_i + \sum X_i Y_i}{n\sum X_i^2 -2\sum X_i^2 + \sum X_i^2}   
+$$
+
+
+Then multiply the numerator and denominator by $1/n$,
+
+$$
+b_1 = \frac{\sum X_i Y_i - \frac{\sum X_i Y_i}{n} - \frac{\sum X_i Y_i}{n} + \frac{\sum X_i Y_i}{n}}{\sum X_i^2 - \frac{2\sum X_i^2}{n} + \frac{\sum X_i^2}{n}} 
+$$
+
+Because we know that $\bar{X} = \frac{\sum X_i}{n}$ and $n\bar{X} = \sum X_i$ we can make substitutions where appropriate to get, 
+
+$$
+b_1 = \frac{\sum X_i Y_i - \sum X_i \bar{Y} - \sum Y_i \bar{X} + n\bar{X} \bar{Y}}{\sum X_i^2 - 2\bar{X}\sum X_i + n\bar{X}^2} 
+$$
+
+Now we can factor out the summations then factor the arguments,
+
+$$
+b_1 = \frac{\sum (X_i Y_i - X_i \bar{Y} - Y_i \bar{X} + \bar{X} \bar{Y})}{\sum ( X_i^2 - 2\bar{X} X_i + \bar{X}^2)}  \\
+b_1 = \frac{\sum (X_i - \bar{X})(Y_i - \bar{Y})}{\sum (X_i - \bar{X})^2}
+$$
+And now our proof comes to a close. 
+
+### Problem 1.34 <span id=points>{3}</span><span id=report>{ / }</span>
+
+
+<br/> 
+
+## Application Points <span id=headpoints>{19} Possible</span>
+
+
+<a id=datalink target="_blank" href=http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/index.html>Download Data Files</a>
+
+
+### Problem 1.19 <span id=recpoints>{4}</span><span id=report>{ 4/4 }</span>
+
+```{r getp19}
+# Load the Problem 1.19 Data into the object "p1.19":
+p1.19 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR19.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.19) <- c("Y","X")
+```
+
+
+The director of admissions of a small college selected 120 students at random from the new freshman class in a study to determine whether  students grade point average (GPA) at the end of the freshman year (Y) can be predicted from the ACT test score (X). The results of the study follow. Assume the the regreesion model is appropriate. 
+
+
+**a. Obtain the least squares estimates of $\beta_0$ and $\beta_1$, and state the estmated regression function.** 
+
+```{R}
+mylm <- lm(Y ~ X, data=p1.19)
+pander(summary(mylm))
+```
+
+
+$$
+b_0 = 2.114  \\
+b_1 = 0.03883  \\
+\hat{Y} = 2.56 + 0.03644X
+$$
+
+**b. Plot the estimated regression function and the data. Does the estimated regression function appear to fit the data well?**  
+
+```{r}
+plot(Y ~ X, data=p1.19, col="blue", pch=16)
+abline(mylm)
+```
+
+The line does not seem to fit it very well. The points are very spread apart. 
+
+**c. Obtain a point estimate of the mean freshman GPA for students with ACT test score $X=30$.**
+
+$$
+\hat{Y} = 2.114 + 0.03883 * (30) = 3.2789
+$$
+
+**d. What is the point estimate of the change in the mean response when the entrance test score increases by one point?**
+
+$$
+b_1=0.03644
+$$
+
+
+### Problem 1.20 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span> 
+
+```{r getp20}
+# Load the Data:
+p1.20 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR20.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.20) <- c("Y","X")
+```
+
+The Tri-City Office Equipment Corporation sells an imported copier on a franchise basis and performs preventive maintenance and repair service on this copier. The data below have been collected from 45 recent calls on the users to perform routine preventice maintenance service; for each call, $X$ is the number of copiers serviced and $Y$ is the total number of minutes spent by the service person. Assume that first-order linear regression model is appropriate. 
+
+**a. Obtain the least squares estimates of $\beta_0$ and $\beta_1$, and state the estmated regression function.** 
+
+```{R}
+mylm2 <- lm(Y ~ X, data=p1.20)
+pander(summary(mylm2))
+```
+
+
+$$
+b_0 = -0.5802  \\
+b_1 = 15.04  \\
+\hat{Y} = -0.5802 + 15.04X
+$$
+
+**b. Plot the estimated regression function and the data. Does the estimated regression function appear to fit the data well?**  
+
+```{r}
+plot(Y ~ X, data=p1.20, col="blue", pch=16)
+abline(mylm2)
+```
+
+The line does seem to fit it very well.
+
+**c. Interpret $b_0$ in your estimated regression function. Does $b_0$ provide any relevant information here? Explain.**
+
+$b_0$ would suggest that if the service person would spend negative time with 0 copiers. This would be impractical. Therefore, it does not provide any relevant information. 
+
+**d. Obtain a point estimate of the mean service time when $X=5$ copiers are serviced.**
+
+$$
+\hat{Y} = -0.5802 + 15.04 * 5 = 74.6198
+$$
+
+
+
+### Problem 1.21 <span id=points>{4}</span><span id=report>{ 4 / 4 }</span> 
+
+```{r getp21}
+# Load the Data:
+p1.21 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR21.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.21) <- c("Y","X")
+```
+
+**a. Obtain the estimated regression function. Plot the estimated regression function and the data. Does a linear regression function appear to give a good fit here?** 
+
+```{R}
+mylm3 <- lm(Y ~ X, data=p1.21)
+pander(summary(mylm3))
+```
+
+$$
+\hat{Y} = 10.2 + 4X 
+$$
+
+
+```{r}
+plot(Y ~ X, data=p1.21, col="blue", pch=16)
+abline(mylm3)
+```
+
+The lines appears to be a good fit. 
+
+**b. Obtain a point estimate of the expected number of broken amplues when $X = 1$ transfer is made.**
+
+$$
+10.2 + 4 * 1 = 14.2 
+$$
+
+**c. Estimate the increase in the expected number of amplues broken when there are 2 transfers as compared to 1 transfer.** 
+
+$$
+b_1 = 4
+$$
+
+**d. Verify that your fitted regression line goes through the point $\bar{X}, \bar{Y}$.**
+
+First we will find what $\bar{X}$ and $\bar{Y}$ are respectively.
+```{r}
+mean(p1.21$X)
+mean(p1.21$Y)
+```
+
+Here we se that $\bar{X}$ and $\bar{Y}$ is the same point in part b of this question. Therefore the fitted regression does go through $\bar{X}$ $\bar{Y}$.
+
+### Problem 1.22 <span id=points>{3}</span><span id=report>{ / }</span> 
+
+```{r getp22}
+# Load the Data:
+p1.22 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR22.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.22) <- c("Y","X")
+```
+
+
+
+### Problem 1.27 <span id=points>{2}</span><span id=report>{ / }</span>
+
+```{r getp27}
+# Load the Data:
+p1.27 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR27.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.27) <- c("Y","X")
+```
+
+
+
+### Problem 1.28 <span id=points>{2}</span><span id=report>{ / }</span>
+
+```{r getp28}
+# Load the Data:
+p1.28 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR28.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.28) <- c("Y","X")
+```
+
+
+
+
+
+
+
+
+
+
+<style>
+#points {
+  font-size:1em;
+  padding-left:15px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:1em;
+  padding-left:15px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#report {
+  font-size:.7em;
+  padding-left:15px;
+  font-weight:normal; 
+  color:#5a5a5a;
+}
+
+#datalink {
+  font-size:.8em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+</style>
+ 
+
+ 
+
+ 

@@ -1,0 +1,346 @@
+---
+title: "Project 4"
+author: "Jacob Jashinsky"
+output: 
+  html_document:
+    theme: cerulean
+    toc: false
+    toc_float: false
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+library(mosaic)
+library(ggplot2)
+library(scales)
+library(car)
+library(lmtest)
+library(alr3)
+```
+
+```{r, eval=FALSE, include=FALSE}
+
+MLA <- read.csv("../Data/MathLabAttendence.csv")
+
+MLA2 <-subset(MLA, Type=="DropIn")
+MLA2 <- subset(MLA2, duration > 1.0 & duration < 300)
+MLA2$Inumber <- droplevels(MLA2$Inumber)
+MLA2$Inumber <- as.integer(MLA2$Inumber)
+
+MLAfr <- subset(MLA2, Class=="Freshman")
+MLAso <- subset(MLA2, Class=="Sophomore")
+MLAjr <- subset(MLA2, Class=="Junior")
+MLAsn <- subset(MLA2, Class=="Senior")
+
+```
+
+```{r, eval=FALSE, include=FALSE}
+IN <- unique(MLAfr$Inumber)
+
+N <- 878
+av <- rep(NA, N)
+count <- rep(NA, N)
+class <- rep(1, N)
+
+for(i in 1:N){
+  av[i] <- mean(subset(MLA2, Inumber==IN[i])$duration)
+}
+
+for(i in 1:N){
+  count[i] <- length(subset(MLA2, Inumber==IN[i])$Inumber)
+}
+
+MLAFR <- data.frame(IN, av, count, class)
+
+IN <- unique(MLAso$Inumber)
+
+N <- 443
+av <- rep(NA, N)
+count <- rep(NA, N)
+class <- rep(2, N)
+
+for(i in 1:N){
+  av[i] <- mean(subset(MLA2, Inumber==IN[i])$duration)
+}
+
+for(i in 1:N){
+  count[i] <- length(subset(MLA2, Inumber==IN[i])$Inumber)
+}
+
+MLASO <- data.frame(IN, av, count, class)
+
+IN <- unique(MLAjr$Inumber)
+
+N <- 274
+av <- rep(NA, N)
+count <- rep(NA, N)
+class <- rep(3, N)
+
+for(i in 1:N){
+  av[i] <- mean(subset(MLA2, Inumber==IN[i])$duration)
+}
+
+for(i in 1:N){
+  count[i] <- length(subset(MLA2, Inumber==IN[i])$Inumber)
+}
+
+MLAJR <- data.frame(IN, av, count, class)
+
+IN <- unique(MLAsn$Inumber)
+
+N <- 122
+av <- rep(NA, N)
+count <- rep(NA, N)
+class <- rep(4, N)
+
+for(i in 1:N){
+  av[i] <- mean(subset(MLA2, Inumber==IN[i])$duration)
+}
+
+for(i in 1:N){
+  count[i] <- length(subset(MLA2, Inumber==IN[i])$Inumber)
+}
+
+MLASR <- data.frame(IN, av, count, class)
+
+MLA4 <- rbind(MLAFR, MLASO, MLAJR, MLASR)
+
+write.csv(MLA4, "averages.csv", row.names=FALSE)
+```
+
+```{r, include=FALSE}
+MLA4 <- read.csv("../Data/averages.csv")
+MLA4$class <- as.factor(MLA4$class)
+```
+
+### Background
+
+I was given data from the math study center. They keep a log of everyone who has visited the lab and how long they stayed. They class rank was also recorded along with their i-number. 
+
+First I needed to clean up the data (not shown). First I subsetted the data so that I was only suing the lab check-ins and not one-on-one appointments. Then I got rid of the check-ins that only lasted for less than a minute because I considered those to be a mistake of the student entering the wrong class. 
+
+It can also be the case that students check-in but forget to check-out. I have done this several times myself. It is difficult to tell what was intentional and what was a mistake so I considered anything to over 5 hours to be a mistake. 
+
+Next I took the average duration for each unique i-number then the total number of times they attended the lab during the 2018 winter semester. 
+
+GPA was unfortunately not included in the data so I am not able to see how the study center is correlated with that variable. So instead my goal is to see if those who stay the most are also the students who come the most.  
+
+Below are two graphs showing the results. (Note that Freshman = 1, Sophomore = 2, Junior = 3 and Senior = 4) 
+```{r}
+ggplot(data = MLA4, aes(x = av, y = count)) + geom_point()  + aes(colour = class) + facet_wrap(~class, ncol = 4) + labs(title = "Study of lab drop-ins. Seperated by class Rank.")
+
+ggplot(data = MLA4, aes(x = av, y = count)) + geom_point()  + aes(colour = class) + labs(title = "Study of lab drop-ins")
+```
+
+### Simple Linear Model
+
+Next I fit a simple linear model to the data.
+
+```{r}
+mla.lm <- lm(count ~ av, data=MLA4)
+summary(mla.lm)
+```
+
+It appears that the parameters are significant however the R2 shows that it was an extremely poor fit. I expected this looking at the graph.
+
+```{r}
+ggplot(data = MLA4, aes(x = av, y = count)) + geom_point()   + stat_smooth(method = lm, se=F) + labs(title = "")
+```
+
+
+```{r}
+plot(mla.lm, which=1:2)
+```
+
+Most if not all assumptions are not met for the linear model. 
+
+Also the plot of Cook's distance leads us to believe that there are many outliers. 
+```{r}
+plot(mla.lm, which=4)
+```
+
+### Multiple Linear Regression Model
+
+Perhaps if I did a multiple linear regression I might be able to get a better fit. 
+
+To see if that was reasonable I created an added variable plot by plotting the residuals of simple linear regression model against class rank. 
+
+```{r}
+boxplot(mla.lm$residuals ~ class, data=MLA4, col=c("#F8766D", "#00BA38", "#619CFF", "#C77CFF"), main="Added Variable Plot")
+```
+
+Class rank doesn't appear to add significant amounts of information but it might do a little bit.
+
+I added it to the model to see what might happen.
+
+```{r}
+mla.lm2 <- lm(count ~ av + class, data=MLA4)
+summary(mla.lm2)
+```
+
+Surprisingly the parameters are still significant. The adjusted R squared is slightly better. 
+
+```{r, eval=FALSE, include=FALSE}
+show_col(hue_pal()(4))
+```
+
+
+```{r}
+b <- mla.lm2$coefficients
+ggplot(data = MLA4, aes(x = av, y = count)) + 
+  geom_point()  + 
+  aes(colour = class) + 
+  labs(title = "Study of lab drop-ins") +
+  stat_function(fun=function(x) (b[1]+b[2]*x), col="#F8766D", lwd=1) +
+  stat_function(fun=function(x) (b[1]+b[3]+b[2]*x), col="#00BA38", lwd=1) +
+  stat_function(fun=function(x) (b[1]+b[4]+b[2]*x), col="#619CFF", lwd=1) + 
+  stat_function(fun=function(x) (b[1]+b[5]+b[2]*x), col="#C77CFF", lwd=1)
+```
+
+
+
+```{r}
+plot(mla.lm2, which=1:2)
+```
+
+The assumptions are still not met. A transformation may be the only thing that could save it. 
+
+### Second Multiple Linear Regression Model
+
+I was then curious about whether adding an interaction term between class rank and average lab time. 
+
+```{r}
+mla.lm3 <- lm(count ~ av + class + av:class, data=MLA4)
+summary(mla.lm3)
+```
+
+```{r}
+ggplot(data = MLA4, aes(x = av, y = count)) + geom_point()  + aes(colour = class)  + stat_smooth(method = lm, se=F) + labs(title = "")
+```
+
+
+This is a much more complicated model, but it still doesn't seem to add much else. I would much rather stay with the first or second model. 
+
+
+### Transformation on Simple Linear Model
+
+```{r}
+boxCox(mla.lm)
+```
+
+In an effort to control the variance a little bit I did a 1/Y transformation on Y and the same X. 
+
+```{r}
+mla.lmT <- lm((1/count) ~ I(1/av), data=MLA4)
+plot(I(1/count) ~ I(1/av), data=MLA4)
+abline(mla.lmT)
+summary(mla.lmT)
+```
+
+The results did not yield much. I as well tried some other transformation and combinations but neither provided anything more.
+
+### More Tests on Simple Linear Model. 
+
+Next I decided to run some formal tests to check the diagnostics of the model. 
+
+
+##### Normality of Error Terms
+To test normality I will find the coefficient of correlation of the residuals and their expected values under normality. 
+
+If the correlation coefficient is large enough I can assume normality of the error terms. 
+
+```{r, include=FALSE}
+mla.qq <- qqnorm(mla.lm$residuals)
+```
+
+```{r}
+cor(mla.qq$x, mla.qq$y)
+```
+
+.8814 is unfortunately not sufficiently large enough when considering the sample size of the data. We cannot assume that the error terms are approximately normally distributed.
+
+
+##### Constant Variance
+
+The Breusch-Pagan test will test for constancy of of Variance. 
+
+For a level of significance of 0.05 we require a critical value from the Chi-Square distribution with a parameter of 1. 
+
+```{r}
+qchisq(.95,1)
+```
+
+If $X^2_{BP} \le 3.8414$ then we conclude the null in that the variance is constant. Otherwise the the variance is not constant. 
+
+
+```{r}
+bptest(mla.lm, studentize=TRUE)
+```
+
+
+29.48 > 3.8414, therefore we conclude the alternative that the variance is **not** constant.
+
+##### F Test for Lack of Fit
+
+
+```{r}
+pureErrorAnova(mla.lm)
+```
+
+The extreme low p-value concludes that the simple linear model is not appropriate for the data. 
+
+
+All of these test conclude that this model should not be trusted nor used. I however, know of no other model to try. 
+
+So for the sake of showing my ability to interpret and to make inferences I will from here on out pretend that it was a good fit. Keep in mind, everything from here on out will be garbage...
+
+### Inferences 
+
+##### Prediction and Confidence Intervals
+
+```{r}
+predict(mla.lm, data.frame(av=100), level=.95, interval="prediction")
+```
+
+
+The prediction interval indicate that those who spend on average 100 minutes in the math lab will visit the lab between 0 to 32 times in the semester.
+
+```{r}
+predict(mla.lm, data.frame(av=100), level=.95, interval="confidence")
+```
+
+However the confidence interval suggests that the average number of visits expected from a student who visits the lab for 100 minutes is between 9 and 11.
+
+##### Confidence Intervals for Parameters
+
+```{r}
+confint(mla.lm)
+```
+
+The table below shows the range that $\beta_0$ and $\beta_1$ could vary with a 95% confidence level.  
+
+The intervals for $\beta_0$ and $\beta_1$ are surprisingly low.
+
+The confidence band is another way to view the possible variability of the line. 
+
+```{r}
+ggplot(data = MLA4, aes(x = av, y = count)) + geom_point()   + stat_smooth(method = lm) + labs(title = "")
+```
+
+
+### Interpretation
+
+The response function is as follows:
+
+$$
+E\{ \hat{Y} \} = 6.72 + .0347X.
+$$
+The intercept does not have much meaning in our model because holding the average at 0 does not make much sense. 
+
+However, the slope does. Increasing the average time spent in the lap by 28.84 minutes would result in attending the lab 1 more time in the semester. 
+
+Although that is what the response function predicts it would not be wise to take it seriously. It is clear from the graph that there are many students who spend less time in the lab and visiting the lab more often than expected. There are also many students have a much larger average but visited the lab only once. 
+
+Although there is a lot of information that can be obtained from the data provided, a linear regression is not useful in this scenario. 
+
+

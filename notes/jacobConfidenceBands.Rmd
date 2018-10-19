@@ -1,0 +1,101 @@
+---
+title: "Untitled"
+output: html_document
+---
+
+```{r p13}
+# Load the Data:
+p1.19 <- read.table("https://netfiles.umn.edu/users/nacht001/www/nachtsheim/Kutner/Chapter%20%201%20Data%20Sets/CH01PR19.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p1.19) <- c("Y","X")
+
+p1.19.lm <- lm(Y ~ X, data=p1.19)
+
+```
+
+
+2.66 d. Determine the boundary values of the 95% confidence band for the regression line when $X_h = 28$. Is your confidence band wider at this point than the confidence interval in part (a)? Should it be? 
+
+```{r}
+#code for boundarys of Confidence band at X_h
+
+SSE <- sum( p1.19.lm$res^2 )
+
+n <- length(p1.19.lm$res)
+
+MSE <- SSE/(n - 2)
+
+xh <- 28 #or whatever xh is for your problem
+
+s2pred <- MSE*(1/n + (xh - mean(p1.19$X))^2 / sum( (p1.19$X - mean(p1.19$X) )^2) )
+
+spred <- sqrt(s2pred)  
+
+W2 <- 2 * qf(1-.05, 2, 118, lower.tail=TRUE)
+
+W <- sqrt(W2)
+
+mofe <- W * spred
+
+Yh <- 2.11405 + 28 * .03883 
+
+Yh - mofe  # lower bound
+
+Yh + mofe # upper bound 
+
+```
+
+my output -> (3.02624, 3.37634)
+
+```{r}
+# Create a confidence bands function:
+confbands <- function(lmObject, xh=NULL, alpha=0.05){
+  
+  # Use some fancy code to get the data out of the lmObject
+  # while knowing which variable was x and which was y.
+  thecall <- strsplit(as.character(lmObject$call[2]), "~")
+  yname <- gsub(" ", "", thecall[[1]][1])
+  xname <- gsub(" ", "", thecall[[1]][2])
+  theData <- lmObject$model
+  theData <- theData[,c(yname,xname)]
+  colnames(theData) <- c("Y","X")
+
+  # Begin creating confidence bands  
+  n <- nrow(theData)
+  W2 <- 2*qf(1-alpha, 2, n-2)
+  SSE <- sum( lmObject$res^2 )
+  MSE <- SSE/(n-2)
+  s2.Yhat.h <- function(xh){
+    MSE*(1/n + (xh - mean(theData$X))^2/sum( (theData$X - mean(theData$X))^2 ))
+  }
+  b <- coef(lmObject)
+  
+  # Add upper bound to scatterplot
+  curve(b[1]+b[2]*x + W2*sqrt(s2.Yhat.h(x)), add=TRUE)
+
+  # Add lower bound to scatterplot
+  curve((b[1]+b[2]*x) - W2*sqrt(s2.Yhat.h(x)), add=TRUE)
+  
+  if (!is.null(xh)){
+    tmp <- c(b[1]+b[2]*xh - sqrt(W2)*sqrt(s2.Yhat.h(xh)), b[1]+b[2]*xh + sqrt(W2)*sqrt(s2.Yhat.h(xh)))
+    names(tmp) <- c("Lower","Upper")
+    tmp
+  }
+}
+```
+
+
+```{r}
+# Scatterplot and fitted regression line:
+
+plot(Y ~ X, data=p1.19)
+
+abline(p1.19.lm)
+
+# Add the confidence bands to the plot
+confbands(p1.19.lm)
+
+# Get the confidence bands value for some xh
+confbands(p1.19.lm, xh=28)
+```

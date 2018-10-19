@@ -1,0 +1,331 @@
+---
+title: "Hard Work 3 Part 2"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r}
+library(car)
+```
+
+
+## Instructions
+
+1. Study Sections 3.9-3.11 of Chapter 3: "Diagnostics and Remedial Measures."    
+
+2. Attempt and submit at least <span id=points style="padding-left:0px;">{27}</span> Hard Work Points by Saturday at 11:59 PM.    
+<span id=note>Over <span id=points style="padding-left:0px;">{37}</span> gets you {+1} Final Exam Point.</span>    
+
+## Reading Points <span id=headpoints>{18} Possible</span>
+
+### Section 3.9 <span id=recpoints>{7}</span><span id=report>{ 7 / 7 }</span>
+
+### Section 3.10 <span id=recpoints>{4}</span><span id=report>{ 4 / 4 }</span>
+
+### Section 3.11 <span id=recpoints>{7}</span><span id=report>{ 7 / 7 }</span>
+
+
+
+## Theory Points <span id=headpoints>{7} Possible</span>
+
+
+
+### Exercise 3.20 <span id=recpoints>{3}</span><span id=report>{ 3 / 3 }</span> 
+
+If the error terms in a regression model are independent $N(0,\sigma^2)$, what can be said about the error terms after the transformation $X'=1/X$ is used? If the situation the same after the transformation $Y'=1/Y$ is used?
+
+Considering that a transformation on X will only change the distances between each X it is logical to say that the independence of the error terms will not be altered. In the model the error terms are not in any way determined by X. 
+
+However, with a transformation on Y, the shape of the distribution can change drastically. This will alter the independence of the error terms. 
+
+
+### Exercise 3.22 <span id=points>{4}</span><span id=report>{ 4 / 4 }</span> 
+
+Using (A.70), (A.41) and (A.42), show that $E \{ MSPE \} = \sigma^2$ for normal error regression model (2.1)
+
+The stated references above are shown below.
+
+(A.70)
+$$
+\frac{(n-1)s^2}{\sigma^2} \sim \chi^2_{n-1}
+$$
+
+(A.41)
+$$
+\chi^2(\nu) = z^2_1+z_2^2+...+z^2_\nu \ \ \ \ \ \text{where the} \ z_i \ \text{are independent}
+$$
+
+(A.42)
+$$
+E \{  \chi^2(\nu) \}=\nu
+$$
+Proof:
+
+Consider the following
+$$
+E \{ MSPE \}
+$$
+By definition $MSPE=SSPE/(n-c)$ so the above expression becomes,
+$$
+E   \Big\{ \frac{SSPE}{n-c} \Big\} 
+$$
+
+Constants can be moved out of the expectation function and by definition SSPE can be expressed as the following,
+$$
+\frac{1}{n-c}E   \Big\{ \sum_{j=1}^c \sum_{i=1}^{n_j} (Y_{ij} - \bar{Y_j})^2 \Big\} 
+$$
+
+Using the fact that $s^2 = \sum (Y_i - \bar{Y})/(n-1)$, where $(n-1)$ is the degrees of freedom of $Y$, the above expression becomes,
+$$
+\frac{1}{n-c}   E \Big\{ \sum_{j=1}^c(n_j-1)s_j^2 \Big\} 
+$$
+
+
+Next multiplying the above equation by a factor of 1, $\sigma^2/ \sigma^2$ it becomes,  
+$$
+\frac{\sigma^2}{n-c}   E \Big\{ \frac{\sum_{j=1}^c(n_j-1)s_j^2}{\sigma^2} \Big\} 
+$$
+
+Using (A.70) we can change the argument of the expectation into a sum of chi-squares.
+$$
+\frac{\sigma^2}{n-c}   E \Big\{ \sum_{j=1}^c \chi^2(n_j-1) \Big\} 
+$$
+
+The expectation can be moved within the sum.
+$$
+\frac{\sigma^2}{n-c} \sum_{j=1}^c E \{ \chi^2(n_j-1) \} 
+$$
+
+Now using (A.42) we can express the above equation as the following
+$$
+\frac{\sigma^2}{n-c} \sum_{j=1}^c (n_j-1) 
+$$
+
+Distributing the sum
+$$
+\frac{\sigma^2}{n-c} \sum_{j=1}^c n_j -  \sum_{j=1}^c 1 
+$$
+
+By definition $\sum_{j=1}^c n_j = n$ so the above becomes,
+$$
+\frac{\sigma^2}{n-c} (n - c) \\
+$$
+
+After simplifying
+$$
+E \{ MSPE \} = \sigma^2
+$$
+
+
+## Application Points <span id=headpoints>{17} Possible</span>
+
+<a id=datalink style="font-size:.9em;" target="_blank" href=http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/index.html>Data Files</a>
+
+
+### Problem 3.16 <span id=recpoints>{6}</span><span id=report>{ 6 / 6 }</span>
+
+```{r p316}
+# Load the Data:
+p3.15 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%203%20Data%20Sets/CH03PR15.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p3.15) <- c("Y","X")
+
+p3.15.lm <- lm(Y~X, data=p3.15)
+
+```
+
+a. Prepare a scatter plot of the data. what transformations of $Y$ might you try, using the prototype patterns in Figure 3.15 to achieve constant variance and linearity?
+
+```{r}
+plot(Y ~ X, data=p3.15)
+abline(p3.15.lm)
+```
+
+based on the figure I would try $Y'=log_{10}Y$.
+
+b. Use the Box-Cox procedure and standardization (3.36) to find an appropriate power transformation. Evaluate SSE for $\lambda = -.2, -.1, 0, .1, .2$. What transformation of $Y$ is suggested? 
+
+```{r}
+boxCox(p3.15.lm, lambda=seq(-.3,.3,.05))
+```
+
+The best lambda seems to be $\lambda=0$. 
+
+SSE for lambda = -.2
+
+```{r}
+K2 <- (prod(p3.15$Y))^(1/15)
+K1 <- 1/(-.2*K2^(-.2-1))
+p3.15$W <- K1*((p3.15$Y^-.2)-1)
+l1lm <- lm(W~X, data=p3.15)
+sum((p3.15$W - l1lm$fitted.values)^2)
+```
+
+SSE for lambda = -.1
+
+```{r}
+K1 <- 1/(-.1*K2^(-.1-1))
+p3.15$W <- K1*((p3.15$Y^-.1)-1)
+l1lm <- lm(W~X, data=p3.15)
+sum((p3.15$W - l1lm$fitted.values)^2)
+```
+
+SSE for lambda = 0
+
+```{r}
+p3.15$W <- K2*(log(p3.15$Y))
+l1lm <- lm(W~X, data=p3.15)
+sum((p3.15$W - l1lm$fitted.values)^2)
+```
+
+SSE for lambda = .1
+
+```{r}
+K1 <- 1/(.1*K2^(.1-1))
+p3.15$W <- K1*((p3.15$Y^.1)-1)
+l1lm <- lm(W~X, data=p3.15)
+sum((p3.15$W - l1lm$fitted.values)^2)
+```
+
+SSE for lambda = .2
+
+```{r}
+K1 <- 1/(.2*K2^(.2-1))
+p3.15$W <- K1*((p3.15$Y^.2)-1)
+l1lm <- lm(W~X, data=p3.15)
+sum((l1lm$residual)^2)
+sum((p3.15$W - l1lm$fitted.values)^2)
+```
+
+c. Use the transformation $Y' = log_{10}Y$ and obtain the estimated linear regression function for the transformed data. 
+
+```{r}
+p3.15$Ynew <- log10(p3.15$Y)
+
+p3.15.lm <- lm(Ynew ~ X, data=p3.15)
+```
+
+$log_{10}\hat{Y} = .655 -.1954X$
+
+d. Plot the estimated regression line and the transformed data. Does the regression line appear to be a good fit to the transformed data? 
+
+```{r}
+plot(Ynew~X,data=p3.15)
+b<-p3.15.lm$coefficients
+abline(p3.15.lm)
+```
+
+If we plot the new estimated regression curve regression curve on the transformed data it does appear to be a good fit.
+
+We can also plot the curve on the original data. 
+
+```{r}
+plot(Y~X,data=p3.15)
+curve(10^(b[1] + b[2]*x), add=TRUE)
+```
+
+e. Obtain the residuals and plot them against the fitted values. Also prepare a normal probability plot. What do your plots show?
+
+```{r}
+plot(p3.15.lm, which = 1:2)
+```
+
+The residuals show that variance is relatively constant and is approximately normal. 
+
+This shows that there is a postie correlation between X and Y. 
+
+f. Express the estimated regression function in the original units. 
+
+$\hat{Y}=10^{.655 -.1954X}$
+
+### Problem 3.17 <span id=points>{6}</span><span id=report>{ / }</span>
+
+```{r p317}
+# Load the Data:
+p3.17 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%203%20Data%20Sets/CH03PR17.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p3.17) <- c("Y","X")
+```
+
+
+### Problem 3.18 <span id=points>{5}</span><span id=report>{ / }</span>
+
+```{r p318}
+# Load the Data:
+p3.18 <- read.table("http://www.stat.ufl.edu/~rrandles/sta4210/Rclassnotes/data/textdatasets/KutnerData/Chapter%20%203%20Data%20Sets/CH03PR18.txt")
+
+# Rewrite the column names to be "Y" and "X" to match the textbook:
+colnames(p3.18) <- c("Y","X")
+```
+
+
+
+
+
+
+
+
+ <style>
+#points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#report {
+  font-size:.7em;
+  padding-left:15px;
+  font-weight:normal; 
+  color:#5a5a5a;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+</style>
+
+
+<footer>
+</footer>
+
+
+
+ 
+
+ 
+
+ 
+
+ 

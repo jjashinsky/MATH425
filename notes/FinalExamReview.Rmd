@@ -1,0 +1,79 @@
+---
+title: "Math 425 - Final Exam Review"
+output: 
+  html_document:
+    theme: cerulean
+---
+
+## Chapter 1: Relations between Variables
+
+You should be able to explain the follow concepts.
+
+* Normal error regression model 
+* Functional relation
+* Statistical relation
+* General idea of least square estimation
+* General idea of maximum likelihood estimation
+
+## Chapter 2: Inference in Regression and Correlation
+
+You should be able to explain these ideas as well as perform them in R.
+
+* SSE, SSR, SSTO
+* $R^2$
+* Hypothesis tests for $\beta_0$ and $\beta_1$
+* Confidence intervals for $\beta_0$ and $\beta_1$.
+* Confidence interval for $E\{Y_h\}$
+* Prediction interval for $Y_h$
+* General linear F Test
+
+
+## Chapter 3: Diagnostics and Remedial Measures
+
+You should be able to explain these ideas as well as perform them in R.
+
+* The six regression assumptions that we diagnose for departures.
+* How to interpret residual vs. fitted-values plots.
+* How to interpret normal Q-Q Plots of residuals.
+* How to test for constant variance, linearity, and normality of errors.
+* Square root, square, and log transformations of both X and Y.
+* Box-Cox transformation for Y.
+
+
+## Chapter 8: Regression Models for Quantitative and Qualitative Predictors
+
+You should be able to explain these ideas as well as perform them in R.
+
+* Interaction regression models like equations (8.22) and (8.28).
+* Qualitative predictors and dummy variables (0, 1 variables) like equation (8.30, 8.31) as well as (8.41).
+* Quantitative and Qualitative interactions like equation (8.49) as well as polynomial versions of this equation like (8.58).
+* Plotting a model like (8.49) using the summary output.
+
+
+## Chapter 9: Model Building and Selection
+
+You should be able to explain these ideas as well as perform them in R.
+
+* Pairs plots.
+* Model selection using criterion such as AIC, SBC, PRESS, $R^2$ or adjusted $R^2$.
+
+
+## Chapter 10.1: Added Variable Plots
+
+You should be able to explain these ideas as well as perform them in R.
+
+* Added variable plots.
+
+## Chapter 11: Robust Regression
+
+You should be able to perform these techniques in R and interpret the results.
+
+* Apply a robust regression in R.
+* Apply a regression tree in R.
+* Apply a Lowess curve to data in R.
+
+## Chapter ?: Special Topics (Student Selected) in Regression
+
+* Ability to read and apply new concepts in regression from independent study.
+
+

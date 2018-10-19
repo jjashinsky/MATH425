@@ -1,0 +1,516 @@
+---
+title: "Project 3 -- Car Buying"
+author: "Jacob Jashinsky"
+output: 
+  html_document:
+    theme: cerulean
+    toc: true
+    toc_float: true
+    code_folding: hide
+---
+
+```{r, include=FALSE}
+library(mosaic)
+library(car)
+library(pander)
+```
+
+
+## Overview
+
+The goal of this project is to come up with a vehicle "buying and selling" strategy.
+
+To be more explicit, vehicles depreciate over time. So the longer you own a vehicle and the more miles you drive with it, the less it is worth. At some point, repair costs start to outway the cost of buying something newer. So, should you buy at 20,000 miles, then sell at 80,000? Should you purchase a 2018 model, then sell it during the year 2030? What is the best "bang for your buck" when it comes to the particular vehicle you currently own (or are interested in) compared to the next vehicle you wish to own after selling (or scrapping) that one?
+
+## Step 1. Find your Data
+
+----
+
+Use a dataset that is provided (in I-Learn) for this project, or collect your own data from the internet.
+
+
+Data was taken from KSL, Facebook, and Dealers in the Idaho area about the price of multiple Hyundai Sonata and Ford Focus.
+
+This was a convenience sampling and not random. 
+
+Because not every seller listed all of the details of the car model, i.e. SE, LX or GLS model, all Sonata and Focus models were grouped under one.  
+
+```{r, include=FALSE}
+
+Boise <- read.csv("../Data/Boise.csv", header=TRUE)
+search <- read.csv("../Data/Hyundai_Ford.csv", header=TRUE)
+View(Boise)
+Boise2 <- Boise
+
+completeFun <- function(data, desiredCols) {
+  completeVec <- complete.cases(data[, desiredCols])
+  return(data[completeVec, ])
+}
+
+Boise2 <- completeFun(Boise, c("mileage", "price") )
+##Changing the term "hyundai" to "Hyundai"
+Boise2$Make <- gsub("hyundai", "Hyundai", Boise2$Make)
+##Changing the term "HYUNDAI" to "Hyundai"
+Boise2$Make <- gsub("HYUNDAI", "Hyundai", Boise2$Make)
+##Changing the term "ford" to "Ford"
+Boise2$Make <- gsub("ford", "Ford", Boise2$Make)
+##Changing the term "FORD" to "Ford"
+Boise2$Make <- gsub("FORD", "Ford", Boise2$Make)
+
+
+Boise3 <- subset(Boise2, Make=="Ford" | Make=="Hyundai")
+
+
+
+
+Boise4 <- subset(Boise3, Model=="Sonata" | Model=="sonata" | Model=="Sonata GLS" | Model=="focus" | Model=="Focus" | Model=="FOCUS" | Model=="focus se" | Model=="Focus se" | Model=="focus se 4dr sedan" | Model=="Focus SE Hatchback" | Model=="focus ses" | Model=="focus xz4 se")
+
+Boise5 <- Boise4
+Boise5$Model <- gsub("focus", "Focus", Boise5$Model)
+Boise5$Model <- gsub("FOCUS", "Focus", Boise5$Model)
+Boise5$Model <- gsub("focus se", "Focus", Boise5$Model)
+Boise5$Model <- gsub("Focus se", "Focus", Boise5$Model)
+Boise5$Model <- gsub("focus se 4dr sedan", "Focus", Boise5$Model)
+Boise5$Model <- gsub("Focus SE Hatchback", "Focus", Boise5$Model)
+Boise5$Model <- gsub("focus ses", "Focus", Boise5$Model)
+Boise5$Model <- gsub("Focus xz4 se", "Focus", Boise5$Model)
+Boise5$Model <- gsub("Focuss", "Focus", Boise5$Model)
+Boise5$Model <- gsub("FOCUS", "Focus", Boise5$Model)
+Boise5$Model <- gsub("Focus 4dr sedan", "Focus", Boise5$Model)
+
+Boise5$Model <- gsub("sonata", "Sonata", Boise5$Model)
+Boise5$Model <- gsub("Sonata GLS", "Sonata", Boise5$Model)
+
+Boise6 <- Boise5
+
+Boise6$size <- Boise6$paintcolor <- Boise6$fuel <- Boise6$drive <- NULL
+Boise7 <- Boise6
+Boise7$mileage <- as.numeric(as.character(Boise7$mileage))
+
+# bad mileage 
+Boise8 <- Boise7[-10, ]
+Boise9 <- Boise8[-10, ]
+Boise10 <- Boise9[-22, ]
+
+#duplicates 
+
+Boise10 <- Boise10[-3, ]
+Boise11 <- Boise10[-22, ]
+Boise12 <- Boise11[-18, ]
+Boise13 <- Boise12[-c(3,5), ]
+
+Boise13$condition <- Boise13$titlestatus <- Boise13$transmission <- NULL
+
+Final <- rbind(Boise13, search)
+
+Final$Make <- as.factor(Final$Make)
+
+
+
+View(Boise13)
+```
+
+
+## Step 2. Model the Data
+
+----
+
+Whether you perform a simple, multiple, or transformation type of regression is up to you. You just need to do something useful with the data in order to reach a good "buying and selling" strategy.
+
+A test data set was made separate from the training set. 
+
+Train has 31 observations and Test has 20 observations. 
+
+```{r}
+set.seed(49)
+testSample <- sample(1:51, 31)
+
+Train <- Final[testSample, ] #Use this to build the model
+
+View(Train)
+
+Test <- Final[-testSample, ] #Leave this alone until we have a model
+
+View(Test)
+```
+
+A plot of the points are shown below. 
+
+```{r}
+plot(price ~ mileage, data=Train, col=as.factor(Train$Make), pch=16)
+legend("topright",lty=1, lwd=5, col=c("black", "red"), legend=c("Focus", "Sonata"),cex=0.7)
+```
+
+## {.tabset .tabset-fade .tabset-pills}
+
+### Model 1
+
+----
+
+Intuition tells me that I would have two lines, one for each model. An interaction will be added as well.
+
+```{r}
+carlm <- lm(price ~ mileage + Make + mileage:Make, data=Train)
+pander(summary(carlm))
+par(mfrow=c(1,2))
+plot(carlm, which=1:2)
+```
+
+The interaction term isn't significant here. But I am going to continue with it and see if a transformation helps. 
+
+Box cox suggest a transformation of $\lambda=.5$ on Y.
+
+```{r}
+boxCox(carlm)
+```
+
+### Model 2
+
+----
+
+A square root on Y was done.  
+
+```{r}
+carlm2 <- lm(price^.5 ~ mileage + as.factor(Make) + mileage:as.factor(Make), data=Train)
+pander(summary(carlm2))
+par(mfrow=c(1,2))
+plot(carlm2, which=1:2)
+```
+
+There is some improvement in R2a  but not much in variance or normality. 
+
+Plots of both the original units and transformed are shown below. 
+
+```{r}
+plot(I(price^.5) ~ mileage, data=Train, col=as.factor(Train$Make), pch=16, main="Transformed data with regression curves")
+b<-carlm2$coefficients
+curve((b[1] + x*b[2]), col="black", add=TRUE)
+curve(b[1] + b[3] + x*(b[2]+b[4]), col="red", add=TRUE)
+legend("topright",lty=1, lwd=5, col=c("black", "red"), legend=c("Focus", "Sonata"),cex=0.7)
+```
+
+
+```{r}
+plot(price ~ mileage, data=Train, col=as.factor(Train$Make), pch=16, main="Original Unit")
+b<-carlm2$coefficients
+curve((b[1] + x*b[2])^2, col="black", add=TRUE)
+curve((b[1] + b[3] + x*(b[2]+b[4]))^2, col="red", add=TRUE)
+legend("topright",lty=1, lwd=5, col=c("black", "red"), legend=c("Focus", "Sonata"),cex=0.7)
+```
+
+The transformation captures the data much better than the first model. 
+
+
+### Model 3
+
+----
+
+A transformation of log on Y was also done.  
+
+```{r}
+carlm3 <- lm(log(price+1) ~ mileage + Make + mileage:Make, data=Train)
+pander(summary(carlm3))
+par(mfrow=c(1,2))
+plot(carlm3, which=1:2)
+```
+
+Not a whole lot improvements here. 
+
+Residuals are slightly better. Normality got worse. 
+
+Same as before, both plots are shown. 
+
+```{r}
+plot(I(log(price+1)) ~ mileage, data=Train, col=as.factor(Train$Make), pch=16, main="Transformed data with regression curves")
+b<-carlm3$coefficients
+curve((b[1] + x*b[2]), col="black", add=TRUE)
+curve(b[1] + b[3] + x*(b[2]+b[4]), col="red", add=TRUE)
+legend("topright",lty=1, lwd=5, col=c("black", "red"), legend=c("Focus", "Sonata"),cex=0.7)
+```
+
+
+```{r}
+plot(price ~ mileage, data=Train, col=as.factor(Train$Make), pch=16, main="Original Unit")
+b<-carlm3$coefficients
+curve(I(exp(b[1] + x*b[2])-1), col="black", add=TRUE)
+curve(I(exp(b[1] + b[3] + x*(b[2]+b[4]))-1), col="red", add=TRUE)
+legend("topright",lty=1, lwd=5, col=c("black", "red"), legend=c("Focus", "Sonata"),cex=0.7)
+```
+
+
+### Model 4
+
+----
+
+The first transformation seem to do the best. To improve the diagnostics, and transformation on X was also done.
+
+At this point I dropped the interaction because it had yet to be significant in any model. 
+
+```{r}
+carlm4 <- lm(price^.5 ~ I(mileage^.5) + Make, data=Train)
+pander(summary(carlm4))
+plot(carlm4, which=1:2)
+```
+
+Here we have the highest R2a yet. 
+
+The residuals are looking much better. Normality has not changed much. 
+
+```{r}
+plot(price ~ mileage, data=Train, col=as.factor(Train$Make), pch=16, main="Oringal units")
+b<-carlm4$coefficients
+curve((b[1] + (x^.5)*b[2])^2, col="black", add=TRUE)
+curve((b[1] + b[3] + (x^.5)*(b[2]))^2, col="red", add=TRUE)
+legend("topright",lty=1, lwd=5, col=c("black", "red"), legend=c("Focus", "Sonata"),cex=0.7)
+```
+
+At this point I will stay with this model for now and proceed to test it. 
+
+### Validation 1
+
+----
+
+```{r}
+carlm5 <- lm(price^.5 ~ I(mileage^.5) + Make, data=Test)
+pander(summary(carlm5))
+plot(carlm5, which=1:2)
+```
+
+Its interesting to note that the estimation for beta3 is quite different as well as the std Error, and it is no longer significant. This troubling for the model. 
+
+The testing data seems to the suggest that there is very little significance difference in price between the two models. 
+
+R2a does appears to be the same. Linearity hasn't changed much but normality has improved. 
+
+```{r}
+plot(price ~ mileage, data=Test, col=as.factor(Test$Make), pch=16, main="Oringal units")
+b<-carlm5$coefficients
+curve((b[1] + (x^.5)*b[2])^2, col="black", add=TRUE)
+curve((b[1] + b[3] + (x^.5)*(b[2]))^2, col="red", add=TRUE)
+legend("topright",lty=1, lwd=5, col=c("black", "red"), legend=c("Focus", "Sonata"),cex=0.7)
+```
+
+```{r}
+yhats <- predict(carlm4, Test) 
+MSPE <- sum((yhats - Test$price)^2)/20
+MSPE
+```
+
+MSPE is also very large as well. 
+
+At this point I am going to go back to the train set and determine another model. 
+
+### Model 5 
+
+----
+
+It appears that there is very little difference between the two car models. 
+
+A more simple model will therefore be investigated. 
+
+```{r}
+carlm6 <- lm(price^.5 ~ I(mileage^.5), data=Train)
+pander(summary(carlm6))
+plot(carlm6, which=1:2) 
+```
+
+Variance is still a of an issue. Normality as improved though and R2a stayed about the same compared to model 4. Residual std error is higher though. 
+
+This might be the best was can do with the current data but we will still check it with the test data set. 
+
+### Validation 2
+
+----
+
+We will validate this model with the test data set.
+
+```{r}
+carlm7 <- lm(price^.5 ~ I(mileage^.5), data=Test)
+pander(summary(carlm7))
+plot(carlm5, which=1:2)
+```
+
+The model appears to fit very well with the test set. R2a has improved. Residual std Error lowered. Diagnostics look better, and each term is significant. 
+
+```{r}
+plot(price ~ mileage, data=Test, col=as.factor(Test$Make), pch=16, main="Oringal units")
+b<-carlm7$coefficients
+curve((b[1] + (x^.5)*b[2])^2, col="black", add=TRUE)
+legend("topright",lty=1, lwd=5, col=c("black", "red"), legend=c("Focus", "Sonata"),cex=0.7)
+```
+
+```{r}
+yhats <- predict(carlm6, Test) 
+MSPE <- sum((Test$price-yhats)^2)/20
+MSPE
+```
+
+This number is still grossly huge. Perhaps I am calculating this wrong. 
+
+But either way! 
+
+All other indicators suggest that this is a good model and has good predictive capability in a general setting. 
+
+### Final Fitting
+
+----
+
+The model, 
+
+
+$$
+\sqrt{Y_i} = \beta_0 + \beta_1 \sqrt{X_i} + \epsilon_i  \ \ \ \text{where} \\
+\epsilon_i \sim N(0, \sigma^2)
+$$
+
+or written as 
+
+$$
+Y_i = (\beta_0 + \beta_1 \sqrt{X_i} + \epsilon_i)^2  \ \ \ \text{where} \\
+\epsilon_i \sim N(0, \sigma^2)
+$$
+
+Now that I have chosen a model I will fit it to the full data set. 
+
+```{r}
+Final.lm <- lm(price^.5 ~ I(mileage^.5), data=Final)  
+pander(summary(Final.lm))
+plot(Final.lm, which=1:2)
+```
+
+
+
+## Step 3. Describe your Strategy
+
+----
+
+Interpret your regression model and use it to develop your strategy for when to buy and sell vehicles in order to get the most "bang for your buck."
+
+```{r}
+plot(price ~ mileage, data=Final, pch=16, col=as.factor(Final$Model) )
+b<- Final.lm$coefficients
+curve((b[1] + (x^.5)*b[2])^2, col="black", add=TRUE)
+```
+
+
+```{r}
+pander(confint(Final.lm), caption=("95% Confidence Intervals for Betas"))
+```
+
+Because the model makes no distinction between models they could almost be considered one in the same. The only difference here is that a new Sonata is significantly more expensive than a new Focus. However, that value depreciates very quickly and then it becomes almost the same as the Focus, except the Focus started out much cheaper. Comparing the only 0 mileage Sonata observed to the most expensive Focus observed there is a difference of $13225. This tells me that purchasing a new Sonata will lead a greater loss in money, but purchasing an older Sonata will not lead an greater loss than an old focus.  
+
+Since it is not in my budget to purchase a brand new car anyways this idea will not be considered. 
+
+But the question remains, is it worth getting a loan to buy a car with less miles than buying a cheaper car out right with significantly more miles.  
+
+The model suggests that the more miles a car holds the slower the car loses value, or that the slope gets less steep as miles increase. With that in mind, it will always be cheaper to buy the car with the most miles because it will be the cheapest. 
+
+That plan, however, only works if the car never breaks down or has the same maintenance as any other car. Sadly this is unrealistic because maintenance costs and repairs always increase as miles increase. I have not collected any data on maintenance cost or repairs so I am not able to accurately predict that at all.
+
+
+First I am going to look at the mean value of my car at the time I would seriously consider selling it which would be at around 190,000 miles. I am currently below 180,000. 
+
+
+```{r}
+pander(predict(Final.lm, data.frame(mileage=190000), interval="confidence")^2, caption="Confidence Interval for a 190,000 mile car")
+```
+
+The confidence interval suggests the could I sell it more than I bought it for $2300. While this could be true in some case it probably wouldn't work out for me. I unfortunately damaged the ECU in my car, an important expensive piece that I haven't repaired which could bring the value down. I would consider the lower estimate to be a fair price. 
+
+```{r}
+pander(predict(Final.lm, data.frame(mileage=50000), interval="confidence")^2, caption="Confidence Interval for a 50,000 mile car")
+```
+
+```{r}
+pander(predict(Final.lm, data.frame(mileage=100000), interval="confidence")^2, caption="Confidence Interval for a 100,000 mile car")
+```
+
+```{r}
+pander(predict(Final.lm, data.frame(mileage=150000), interval="confidence")^2, caption="Confidence Interval for a 150,000 mile car")
+```
+
+If I were to buy a car with 50,000 miles and sell it at 100,000, using the fitted values, I could expect to loose around $4090. 
+
+If I were to buy a car with 100,000 miles and sell it at 150,000, using the fitted values, I could expect to loose only $2425.
+
+That is a difference of $1665. This would mean that buying with 100,000 leads less of a loss than buying one with 50,000 miles. However, repairs on a car with 100,000 - 150,000 miles are likely and could easily exceed 1665 dollars. Depending on my luck of course. 
+
+Repairs would be less likely from 50,000-100,000 miles but a loan would almost certainly be necessary at that point. If $10200 were borrowed for car with 50,000 miles at an interest rate of 8.0% for 5 years, above 2200 dollars would be spent on interest alone and above 1000 dollars for 4.0%. This is excluding an repairs that the car might need and is not including that the loss of value over time. However, the car would be in much better condition and would hopefully require less maintenance. To some, that is worth it.  
+
+If I could purchase a car with 150,000 miles without a loan then I would not have to pay anywhere from $1000-2200 in interest and I would also be saving around 1665 dollars because that car would depreciate much slower. That savings could be enough to cover any loses incurred by repairs. 
+
+To recap, when it comes time to purchasing a new car, I see positives and negatives in both options. 
+
+If I value readability then a more expensive car would be okay. If I value frugality and perhaps a bit of gambling then a cheaper car would be the best option. 
+
+If I find a really good deal on a low mile car it would probably be worth it, and if I also find a really good deal on a high mileage car, it would also be worth it. 
+
+
+## Grading
+
+----
+
+You will be graded on two things.
+
+1. How well you apply the regression principles we have learned thus far this semester. (Think Projects 1 and 2.) 
+
+2. How well you interpret your results and describe your "buying and selling" strategy.
+
+
+
+
+
+
+
+
+<style>
+#points {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#317eac;
+}
+
+#recpoints {
+  font-size:.8em;
+  padding-left:5px;
+  font-weight:bold; 
+  color:#7eac31;
+}
+
+#datalink {
+  font-size:.5em;
+  color:#317eac;
+  padding-left:5px;
+}
+
+#headnote {
+  font-size:.6em;
+  color:#787878;
+}
+
+#note {
+  font-size:.8em;
+  color:#787878;
+}
+
+#headpoints {
+ font-size:12pt;
+ color: #585858; 
+ padding-left: 15px;
+}
+</style>
+
+
+<footer>
+</footer>
+
+
+
+ 
+
+ 
+
+ 
+
+ 

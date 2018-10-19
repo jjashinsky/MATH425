@@ -1,0 +1,49 @@
+---
+title: "Test"
+output: html_document
+---
+
+```{r, include=FALSE}
+library(mosaic)
+library(car)
+```
+
+
+## {.tabset .tabset-fade .tabset-pills}
+
+### Overview  
+
+Here are good example data with variablles that could be used for one sample t tests 
+
+#### {.tabset .tabset-fade .tabset-pills}
+
+
+##### dataset1
+
+```{r}
+head(cars)
+```
+
+
+##### dataset2
+
+```{r}
+head(beaver1)
+```
+
+##### dataset3
+
+```{r}
+head(airquality)
+```
+
+
+
+### Graphs 
+
+Graphs
+
+### Test
+
+test stuff
+
